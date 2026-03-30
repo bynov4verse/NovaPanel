@@ -347,7 +347,7 @@ td strong{color:var(--text);font-weight:600}
     <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
     <button class="pkey" onclick="pk('back')">⌫</button><button class="pkey" onclick="pk('0')">0</button><button class="pkey ok-key" onclick="pk('ok')">OK</button>
   </div>
-  <span class="pin-link" data-action="openCfgPin">Cambiar PIN · Sin PIN</span>
+  <span class="pin-link" data-action="openCfgPin" onclick="window._btn(this)">Cambiar PIN · Sin PIN</span>
 </div>
 
 <!-- Modal Config PIN -->
@@ -365,9 +365,9 @@ td strong{color:var(--text);font-weight:600}
     </div>
     <div id="cfg-pin-err" style="font-family:var(--mono);font-size:10px;color:var(--danger);margin-bottom:.75rem;min-height:14px"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" data-action="desactivarPin">Sin PIN</button>
-      <button class="btn btn-ghost btn-sm" data-action="closePinCfg">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="guardarPinCfg" style="margin-left:auto">Guardar PIN</button>
+      <button class="btn btn-danger btn-sm" data-action="desactivarPin" onclick="window._btn(this)">Sin PIN</button>
+      <button class="btn btn-ghost btn-sm" data-action="closePinCfg" onclick="window._btn(this)">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="guardarPinCfg" style="margin-left:auto" onclick="window._btn(this)">Guardar PIN</button>
     </div>
   </div>
 </div>
@@ -391,8 +391,8 @@ td strong{color:var(--text);font-weight:600}
   <div class="nav-item" data-page="calendario" onclick="goTo(this)"><span class="nav-icon">▦</span>Calendario</div>
   <div class="nav-item" data-page="alertas" onclick="goTo(this)"><span class="nav-icon">◬</span>Alertas<span class="nav-badge danger" id="b-alert">0</span></div>
   <div class="sidebar-footer">
-    <button class="sidebar-btn" data-action="toggleTema"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
-    <button class="sidebar-btn" data-action="openCfgPin"><span>⚿</span>Configurar PIN</button>
+    <button class="sidebar-btn" data-action="toggleTema" onclick="window._btn(this)"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
+    <button class="sidebar-btn" data-action="openCfgPin" onclick="window._btn(this)"><span>⚿</span>Configurar PIN</button>
   </div>
 </nav>
 
@@ -411,11 +411,11 @@ td strong{color:var(--text);font-weight:600}
     <div class="topbar">
       <div><div class="page-title">Dashboard</div><div class="page-sub">// resumen general · novaverse</div></div>
       <div class="btn-group">
-        <button class="btn btn-ghost btn-sm" data-action="exportJSON">↓ Backup JSON</button>
-        <button class="btn btn-ghost btn-sm" data-action="triggerImport">↑ Restaurar</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportJSON" onclick="window._btn(this)">↓ Backup JSON</button>
+        <button class="btn btn-ghost btn-sm" data-action="triggerImport" onclick="window._btn(this)">↑ Restaurar</button>
         <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
-        <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
-        <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top">☽</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportCSV" onclick="window._btn(this)">↓ CSV</button>
+        <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top" onclick="window._btn(this)">☽</button>
       </div>
     </div>
     <div class="stats">
@@ -444,16 +444,16 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-clientes">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--pink),#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Clientes</div><div class="page-sub">// canal clientes finales · rosa</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openReg" data-tipo="cliente">+ Nuevo cliente</button>
+      <button class="btn btn-primary btn-sm" data-action="openReg" data-tipo="cliente" onclick="window._btn(this)">+ Nuevo cliente</button>
     </div>
     <div class="card" style="border-color:var(--cli-border)">
       <div class="card-head">
         <span class="card-title">todos los clientes</span>
         <div class="filters">
-          <button class="filter-btn active" data-action="setF" data-col="clientes" data-val="todos">Todos</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="activo">Activos</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="por vencer">Por vencer</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="vencido">Vencidos</button>
+          <button class="filter-btn active" data-action="setF" data-col="clientes" data-val="todos" onclick="window._btn(this)">Todos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="activo" onclick="window._btn(this)">Activos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="por vencer" onclick="window._btn(this)">Por vencer</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="vencido" onclick="window._btn(this)">Vencidos</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('clientes',this.value)">
         </div>
       </div>
@@ -466,15 +466,15 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-revendedores">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--rev),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Revendedores</div><div class="page-sub">// canal mayorista · índigo</div></div>
-      <button class="btn btn-rev btn-sm" data-action="openReg" data-tipo="revendedor">+ Nuevo revendedor</button>
+      <button class="btn btn-rev btn-sm" data-action="openReg" data-tipo="revendedor" onclick="window._btn(this)">+ Nuevo revendedor</button>
     </div>
     <div class="card" style="border-color:var(--rev-border)">
       <div class="card-head">
         <span class="card-title rev-title">todos los revendedores</span>
         <div class="filters">
-          <button class="filter-btn rev-filter active" data-action="setF" data-col="revendedores" data-val="todos">Todos</button>
-          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="activo">Activos</button>
-          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="por vencer">Por vencer</button>
+          <button class="filter-btn rev-filter active" data-action="setF" data-col="revendedores" data-val="todos" onclick="window._btn(this)">Todos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="activo" onclick="window._btn(this)">Activos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="por vencer" onclick="window._btn(this)">Por vencer</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('revendedores',this.value)">
         </div>
       </div>
@@ -487,7 +487,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-proveedores">
     <div class="topbar">
       <div><div class="page-title">Proveedores</div><div class="page-sub">// costos mayoristas</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openProv">+ Nuevo proveedor</button>
+      <button class="btn btn-primary btn-sm" data-action="openProv" onclick="window._btn(this)">+ Nuevo proveedor</button>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-title">todos los proveedores</span></div>
@@ -500,7 +500,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-reembolsos">
     <div class="topbar">
       <div><div class="page-title">Reembolsos</div><div class="page-sub">// deudas y compensaciones</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openReemb">+ Registrar reembolso</button>
+      <button class="btn btn-primary btn-sm" data-action="openReemb" onclick="window._btn(this)">+ Registrar reembolso</button>
     </div>
     <div class="reemb-banner">Los reembolsos son deudas de períodos anteriores. <strong>No afectan los ingresos del mes actual</strong> — se registran aparte como ajuste contable del período de origen.</div>
     <div class="stats">
@@ -512,9 +512,9 @@ td strong{color:var(--text);font-weight:600}
     <div class="card">
       <div class="card-head"><span class="card-title">registro de reembolsos</span>
         <div class="filters">
-          <button class="filter-btn active" data-action="setFR" data-val="todos">Todos</button>
-          <button class="filter-btn" data-action="setFR" data-val="pendiente">Pendientes</button>
-          <button class="filter-btn" data-action="setFR" data-val="saldado">Saldados</button>
+          <button class="filter-btn active" data-action="setFR" data-val="todos" onclick="window._btn(this)">Todos</button>
+          <button class="filter-btn" data-action="setFR" data-val="pendiente" onclick="window._btn(this)">Pendientes</button>
+          <button class="filter-btn" data-action="setFR" data-val="saldado" onclick="window._btn(this)">Saldados</button>
         </div>
       </div>
       <table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
@@ -526,7 +526,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-contabilidad">
     <div class="topbar">
       <div><div class="page-title">Contabilidad</div><div class="page-sub">// ingresos · gastos · ganancias</div></div>
-      <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
+      <button class="btn btn-ghost btn-sm" data-action="exportCSV" onclick="window._btn(this)">↓ CSV</button>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
     <div class="stats">
@@ -546,9 +546,9 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-calendario">
     <div class="topbar"><div><div class="page-title">Calendario</div><div class="page-sub">// vencimientos del mes</div></div></div>
     <div class="cal-nav">
-      <button class="cal-nav-btn" data-action="calNav" data-d="-1">‹</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="-1" onclick="window._btn(this)">‹</button>
       <span class="cal-title" id="cal-title"></span>
-      <button class="cal-nav-btn" data-action="calNav" data-d="1">›</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="1" onclick="window._btn(this)">›</button>
     </div>
     <div class="cal-grid" id="cal-heads"></div>
     <div class="cal-grid" id="cal-days"></div>
@@ -564,7 +564,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- FAB NOTAS -->
-<button class="fab" data-action="toggleNotas" title="Notas rápidas">✎</button>
+<button class="fab" data-action="toggleNotas" title="Notas rápidas" onclick="window._btn(this)">✎</button>
 <div class="notes-panel" id="notes-panel">
   <div class="notes-head">✎ Notas rápidas</div>
   <textarea class="notes-ta" id="notes-ta" placeholder="Anota algo al vuelo..." oninput="saveNotas()"></textarea>
@@ -572,7 +572,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- OVERLAY -->
-<div class="overlay" id="overlay" id="overlay-bg">
+<div class="overlay" id="overlay">
 
   <!-- Modal Registro -->
   <div class="modal" id="m-reg" onclick="e=>e.stopPropagation()" style="display:none">
@@ -654,8 +654,8 @@ td strong{color:var(--text);font-weight:600}
       <div id="f-hist"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveReg">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReg" onclick="window._btn(this)">Guardar</button>
     </div>
   </div>
 
@@ -683,8 +683,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Notas</label><input id="p-not" placeholder="Condiciones..."></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveProv">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveProv" onclick="window._btn(this)">Guardar</button>
     </div>
   </div>
 
@@ -712,8 +712,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Motivo</label><textarea id="rb-mot" rows="2" placeholder="Describe el motivo..."></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveReemb">Registrar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReemb" onclick="window._btn(this)">Registrar</button>
     </div>
   </div>
 
@@ -934,10 +934,10 @@ function renderTbl(col){
       <td class="mono" style="font-size:10px">${r.vence||'—'}<div style="color:${d<0?'var(--danger)':d<=3?'var(--warn)':'var(--text-dim)'};font-size:9px">${d<999?(d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'):'sin fecha'}</div></td>
       <td>${sB(e)}</td>
       <td><div class="actions">
-        <button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" title="Renovar">↺</button>
-        <button class="btn btn-warn btn-xs" data-action="waRec" data-col="${dbKey}" data-id="${r.id}" title="WA">📱</button>
-        <button class="btn btn-ghost btn-xs" data-action="openReg" data-tipo="${isRev?'revendedor':'cliente'}" data-id="${r.id}">✎</button>
-        <button class="btn btn-danger btn-xs" data-action="del" data-col="${dbKey}" data-id="${r.id}">✕</button>
+        <button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" title="Renovar" onclick="window._btn(this)">↺</button>
+        <button class="btn btn-warn btn-xs" data-action="waRec" data-col="${dbKey}" data-id="${r.id}" title="WA" onclick="window._btn(this)">📱</button>
+        <button class="btn btn-ghost btn-xs" data-action="openReg" data-tipo="${isRev?'revendedor':'cliente'}" data-id="${r.id}" onclick="window._btn(this)">✎</button>
+        <button class="btn btn-danger btn-xs" data-action="del" data-col="${dbKey}" data-id="${r.id}" onclick="window._btn(this)">✕</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -949,7 +949,7 @@ function renderProv(){
   if(!data.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin proveedores</div></div></td></tr>`;return;}
   tbody.innerHTML=data.map(p=>{
     const d=dR(p.pago);
-    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" data-action="openProv" data-id="${p.id}">✎</button><button class="btn btn-danger btn-xs" data-action="del" data-col="prov" data-id="${p.id}">✕</button></div></td></tr>`;
+    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" data-action="openProv" data-id="${p.id}" onclick="window._btn(this)">✎</button><button class="btn btn-danger btn-xs" data-action="del" data-col="prov" data-id="${p.id}" onclick="window._btn(this)">✕</button></div></td></tr>`;
   }).join('');
 }
 
@@ -973,9 +973,9 @@ function renderReemb(){
     <td>${sB(r.estado)}</td>
     <td class="mono" style="font-size:10px">${r.fechaSaldo||'—'}</td>
     <td><div class="actions">
-      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}">✓</button>`:''}
-      <button class="btn btn-ghost btn-xs" data-action="openReemb" data-id="${r.id}">✎</button>
-      <button class="btn btn-danger btn-xs" data-action="del" data-col="reemb" data-id="${r.id}">✕</button>
+      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" onclick="window._btn(this)">✓</button>`:''}
+      <button class="btn btn-ghost btn-xs" data-action="openReemb" data-id="${r.id}" onclick="window._btn(this)">✎</button>
+      <button class="btn btn-danger btn-xs" data-action="del" data-col="reemb" data-id="${r.id}" onclick="window._btn(this)">✕</button>
     </div></td>
   </tr>`).join('');
 }
@@ -996,7 +996,7 @@ function renderDash(){
   const tbody=document.getElementById('dash-tbl');
   tbody.innerHTML=prox.length?prox.map(r=>{
     const d=dR(r.vence);const isRev=DB.rev().some(x=>x.id===r.id);const dbKey=isRev?'rev':'cli';
-    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" data-dash="1">↺</button></td></tr>`;
+    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" data-dash="1" onclick="window._btn(this)">↺</button></td></tr>`;
   }).join(''):`<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin vencimientos próximos</div></div></td></tr>`;
   // alertas
   const alV=todos.filter(r=>{const d=dR(r.vence);return d>=0&&d<=7;});
@@ -1023,7 +1023,7 @@ function renderCont(){
   const meses=[...new Set(todos.map(r=>mesYM(r.vence)).filter(Boolean))].sort().reverse();
   if(!meses.length){document.getElementById('month-tabs').innerHTML='<span class="mono" style="color:var(--text-dim);font-size:10px">Sin datos aún</span>';return;}
   if(!mesAct||!meses.includes(mesAct))mesAct=meses[0];
-  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" data-action="selMes" data-mes="${m}">${mesLbl(m)}</button>`).join('');
+  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" data-action="selMes" data-mes="${m}" onclick="window._btn(this)">${mesLbl(m)}</button>`).join('');
   const delMes=todos.filter(r=>mesYM(r.vence)===mesAct);
   const ing=delMes.reduce((s,r)=>s+(r.cobrado||0),0);
   const gas=delMes.reduce((s,r)=>s+(r.primerMes?r.costo1:r.costor)||0,0);
@@ -1083,7 +1083,7 @@ function renderAlertas(){
   const reemb=DB.reemb().filter(r=>r.estado==='pendiente');
   const grp=(label,items,cls='')=>!items.length?'':`<div style="margin-bottom:1.25rem"><div class="section-grp">${label} <span class="badge-count">${items.length}</span></div>${items.map(r=>{const d=dR(r.vence);return`<div class="alert-item ${cls} ${r._isRev?'rev':'info'}"><span>◬</span><div class="alert-text"><strong>${r.nombre}</strong> <span class="tag" style="margin-left:.25rem;${r._isRev?'color:var(--rev)':'color:var(--pink)'}">${r._isRev?'Rev.':'Cliente'}</span> · ${r.servicio}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.telefono||''}</span></div><span class="alert-days">${d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'}</span></div>`;}).join('')}</div>`;
   let html='';
-  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" data-alertas="1">✓</button></div>`).join('')}</div>`;
+  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" data-alertas="1" onclick="window._btn(this)">✓</button></div>`).join('')}</div>`;
   html+=grp('vencidos',venc,'danger')+grp('próximos 7 días',p7)+grp('próximos 30 días',p30);
   document.getElementById('lista-alertas').innerHTML=html||`<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin alertas activas</div></div>`;
 }
@@ -1119,7 +1119,7 @@ function buscarG(val){
   const q=val.toLowerCase();
   const todos=[...DB.cli().map(r=>({...r,_t:'cli'})),...DB.rev().map(r=>({...r,_t:'rev'})),...DB.prov().map(r=>({...r,_t:'prov'}))];
   const found=todos.filter(r=>(r.nombre+r.servicio+(r.emprendimiento||'')).toLowerCase().includes(q)).slice(0,8);
-  res.innerHTML=found.length?found.map(r=>`<div class="gresult" data-action="irA" data-t="${r._t}" data-id="${r.id}"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
+  res.innerHTML=found.length?found.map(r=>`<div class="gresult" data-action="irA" data-t="${r._t}" data-id="${r.id}" onclick="window._btn(this)"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
   res.classList.add('show');
 }
 function irA(t,id){
@@ -1235,6 +1235,45 @@ renderDash();
           .catch(e => console.warn('SW error:', e));
       });
     }
-  </script>
+  
+// ── EXPONER FUNCIONES EN WINDOW (compatibilidad WebView Android) ──
+window._btn = function(el) {
+  var action = el.getAttribute('data-action');
+  var tipo   = el.getAttribute('data-tipo');
+  var id     = el.getAttribute('data-id');
+  var col    = el.getAttribute('data-col');
+  var val    = el.getAttribute('data-val');
+  var d      = el.getAttribute('data-d');
+  var mes    = el.getAttribute('data-mes');
+  var t      = el.getAttribute('data-t');
+  if(action==='openReg')      openReg(tipo, id||null);
+  else if(action==='openProv')     openProv(id||null);
+  else if(action==='openReemb')    openReemb(id||null);
+  else if(action==='renovar')      { renovar(col,id); if(el.getAttribute('data-dash'))renderDash(); }
+  else if(action==='waRec')        waRec(col,id);
+  else if(action==='del')          del(col,id);
+  else if(action==='saldar')       { saldar(id); if(el.getAttribute('data-alertas'))renderAlertas(); }
+  else if(action==='setF')         setF(col,val,el);
+  else if(action==='setFR')        setFR(val,el);
+  else if(action==='closeModal')   closeModal();
+  else if(action==='saveReg')      saveReg();
+  else if(action==='saveProv')     saveProv();
+  else if(action==='saveReemb')    saveReemb();
+  else if(action==='toggleTema')   toggleTema();
+  else if(action==='toggleNotas')  toggleNotas();
+  else if(action==='openCfgPin')   openCfgPin();
+  else if(action==='exportJSON')   exportJSON();
+  else if(action==='exportCSV')    exportCSV();
+  else if(action==='saveMeta')     saveMeta();
+  else if(action==='triggerImport') document.getElementById('imp-file').click();
+  else if(action==='guardarPinCfg') guardarPinCfg();
+  else if(action==='desactivarPin') desactivarPin();
+  else if(action==='closePinCfg')   closePinCfg();
+  else if(action==='calNav')        calNav(+d);
+  else if(action==='selMes')        selMes(mes);
+  else if(action==='irA')           irA(t,id);
+};
+
+</script>
 </body>
 </html>
