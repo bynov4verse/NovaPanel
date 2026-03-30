@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bynov4verse.panel.twa",
+      "sha256_cert_fingerprints": [
+        "REEMPLAZA_CON_TU_SHA256_DE_PWABUILDER"
+      ]
+    }
+  }
+]
