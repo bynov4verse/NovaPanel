@@ -365,9 +365,9 @@ td strong{color:var(--text);font-weight:600}
     </div>
     <div id="cfg-pin-err" style="font-family:var(--mono);font-size:10px;color:var(--danger);margin-bottom:.75rem;min-height:14px"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" onclick="desactivarPin()">Sin PIN</button>
-      <button class="btn btn-ghost btn-sm" onclick="closePinCfg()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="guardarPinCfg()" style="margin-left:auto">Guardar PIN</button>
+      <button class="btn btn-danger btn-sm" data-action="desactivarPin">Sin PIN</button>
+      <button class="btn btn-ghost btn-sm" data-action="closePinCfg">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="guardarPinCfg" style="margin-left:auto">Guardar PIN</button>
     </div>
   </div>
 </div>
@@ -412,7 +412,7 @@ td strong{color:var(--text);font-weight:600}
       <div><div class="page-title">Dashboard</div><div class="page-sub">// resumen general · novaverse</div></div>
       <div class="btn-group">
         <button class="btn btn-ghost btn-sm" data-action="exportJSON">↓ Backup JSON</button>
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp-file').click()">↑ Restaurar</button>
+        <button class="btn btn-ghost btn-sm" data-action="triggerImport">↑ Restaurar</button>
         <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
         <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
         <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top">☽</button>
@@ -450,10 +450,10 @@ td strong{color:var(--text);font-weight:600}
       <div class="card-head">
         <span class="card-title">todos los clientes</span>
         <div class="filters">
-          <button class="filter-btn active" onclick="setF('clientes','todos',this)">Todos</button>
-          <button class="filter-btn" onclick="setF('clientes','activo',this)">Activos</button>
-          <button class="filter-btn" onclick="setF('clientes','por vencer',this)">Por vencer</button>
-          <button class="filter-btn" onclick="setF('clientes','vencido',this)">Vencidos</button>
+          <button class="filter-btn active" data-action="setF" data-col="clientes" data-val="todos">Todos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="activo">Activos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="por vencer">Por vencer</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="vencido">Vencidos</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('clientes',this.value)">
         </div>
       </div>
@@ -472,9 +472,9 @@ td strong{color:var(--text);font-weight:600}
       <div class="card-head">
         <span class="card-title rev-title">todos los revendedores</span>
         <div class="filters">
-          <button class="filter-btn rev-filter active" onclick="setF('revendedores','todos',this)">Todos</button>
-          <button class="filter-btn rev-filter" onclick="setF('revendedores','activo',this)">Activos</button>
-          <button class="filter-btn rev-filter" onclick="setF('revendedores','por vencer',this)">Por vencer</button>
+          <button class="filter-btn rev-filter active" data-action="setF" data-col="revendedores" data-val="todos">Todos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="activo">Activos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="por vencer">Por vencer</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('revendedores',this.value)">
         </div>
       </div>
@@ -512,9 +512,9 @@ td strong{color:var(--text);font-weight:600}
     <div class="card">
       <div class="card-head"><span class="card-title">registro de reembolsos</span>
         <div class="filters">
-          <button class="filter-btn active" onclick="setFR('todos',this)">Todos</button>
-          <button class="filter-btn" onclick="setFR('pendiente',this)">Pendientes</button>
-          <button class="filter-btn" onclick="setFR('saldado',this)">Saldados</button>
+          <button class="filter-btn active" data-action="setFR" data-val="todos">Todos</button>
+          <button class="filter-btn" data-action="setFR" data-val="pendiente">Pendientes</button>
+          <button class="filter-btn" data-action="setFR" data-val="saldado">Saldados</button>
         </div>
       </div>
       <table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
@@ -546,9 +546,9 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-calendario">
     <div class="topbar"><div><div class="page-title">Calendario</div><div class="page-sub">// vencimientos del mes</div></div></div>
     <div class="cal-nav">
-      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="-1">‹</button>
       <span class="cal-title" id="cal-title"></span>
-      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="1">›</button>
     </div>
     <div class="cal-grid" id="cal-heads"></div>
     <div class="cal-grid" id="cal-days"></div>
@@ -934,10 +934,10 @@ function renderTbl(col){
       <td class="mono" style="font-size:10px">${r.vence||'—'}<div style="color:${d<0?'var(--danger)':d<=3?'var(--warn)':'var(--text-dim)'};font-size:9px">${d<999?(d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'):'sin fecha'}</div></td>
       <td>${sB(e)}</td>
       <td><div class="actions">
-        <button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}')" title="Renovar">↺</button>
-        <button class="btn btn-warn btn-xs" onclick="waRec('${dbKey}','${r.id}')" title="Recordatorio WA">📱</button>
-        <button class="btn btn-ghost btn-xs" onclick="openReg('${isRev?'revendedor':'cliente'}','${r.id}')">✎</button>
-        <button class="btn btn-danger btn-xs" onclick="del('${dbKey}','${r.id}')">✕</button>
+        <button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" title="Renovar">↺</button>
+        <button class="btn btn-warn btn-xs" data-action="waRec" data-col="${dbKey}" data-id="${r.id}" title="WA">📱</button>
+        <button class="btn btn-ghost btn-xs" data-action="openReg" data-tipo="${isRev?'revendedor':'cliente'}" data-id="${r.id}">✎</button>
+        <button class="btn btn-danger btn-xs" data-action="del" data-col="${dbKey}" data-id="${r.id}">✕</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -949,7 +949,7 @@ function renderProv(){
   if(!data.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin proveedores</div></div></td></tr>`;return;}
   tbody.innerHTML=data.map(p=>{
     const d=dR(p.pago);
-    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" onclick="openProv('${p.id}')">✎</button><button class="btn btn-danger btn-xs" onclick="del('prov','${p.id}')">✕</button></div></td></tr>`;
+    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" data-action="openProv" data-id="${p.id}">✎</button><button class="btn btn-danger btn-xs" data-action="del" data-col="prov" data-id="${p.id}">✕</button></div></td></tr>`;
   }).join('');
 }
 
@@ -973,9 +973,9 @@ function renderReemb(){
     <td>${sB(r.estado)}</td>
     <td class="mono" style="font-size:10px">${r.fechaSaldo||'—'}</td>
     <td><div class="actions">
-      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" onclick="saldar('${r.id}')">✓</button>`:''}
-      <button class="btn btn-ghost btn-xs" onclick="openReemb('${r.id}')">✎</button>
-      <button class="btn btn-danger btn-xs" onclick="del('reemb','${r.id}')">✕</button>
+      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}">✓</button>`:''}
+      <button class="btn btn-ghost btn-xs" data-action="openReemb" data-id="${r.id}">✎</button>
+      <button class="btn btn-danger btn-xs" data-action="del" data-col="reemb" data-id="${r.id}">✕</button>
     </div></td>
   </tr>`).join('');
 }
@@ -996,7 +996,7 @@ function renderDash(){
   const tbody=document.getElementById('dash-tbl');
   tbody.innerHTML=prox.length?prox.map(r=>{
     const d=dR(r.vence);const isRev=DB.rev().some(x=>x.id===r.id);const dbKey=isRev?'rev':'cli';
-    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}');renderDash()">↺</button></td></tr>`;
+    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" data-dash="1">↺</button></td></tr>`;
   }).join(''):`<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin vencimientos próximos</div></div></td></tr>`;
   // alertas
   const alV=todos.filter(r=>{const d=dR(r.vence);return d>=0&&d<=7;});
@@ -1023,7 +1023,7 @@ function renderCont(){
   const meses=[...new Set(todos.map(r=>mesYM(r.vence)).filter(Boolean))].sort().reverse();
   if(!meses.length){document.getElementById('month-tabs').innerHTML='<span class="mono" style="color:var(--text-dim);font-size:10px">Sin datos aún</span>';return;}
   if(!mesAct||!meses.includes(mesAct))mesAct=meses[0];
-  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" onclick="selMes('${m}')">${mesLbl(m)}</button>`).join('');
+  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" data-action="selMes" data-mes="${m}">${mesLbl(m)}</button>`).join('');
   const delMes=todos.filter(r=>mesYM(r.vence)===mesAct);
   const ing=delMes.reduce((s,r)=>s+(r.cobrado||0),0);
   const gas=delMes.reduce((s,r)=>s+(r.primerMes?r.costo1:r.costor)||0,0);
@@ -1083,7 +1083,7 @@ function renderAlertas(){
   const reemb=DB.reemb().filter(r=>r.estado==='pendiente');
   const grp=(label,items,cls='')=>!items.length?'':`<div style="margin-bottom:1.25rem"><div class="section-grp">${label} <span class="badge-count">${items.length}</span></div>${items.map(r=>{const d=dR(r.vence);return`<div class="alert-item ${cls} ${r._isRev?'rev':'info'}"><span>◬</span><div class="alert-text"><strong>${r.nombre}</strong> <span class="tag" style="margin-left:.25rem;${r._isRev?'color:var(--rev)':'color:var(--pink)'}">${r._isRev?'Rev.':'Cliente'}</span> · ${r.servicio}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.telefono||''}</span></div><span class="alert-days">${d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'}</span></div>`;}).join('')}</div>`;
   let html='';
-  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" onclick="saldar('${r.id}');renderAlertas()">✓</button></div>`).join('')}</div>`;
+  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" data-alertas="1">✓</button></div>`).join('')}</div>`;
   html+=grp('vencidos',venc,'danger')+grp('próximos 7 días',p7)+grp('próximos 30 días',p30);
   document.getElementById('lista-alertas').innerHTML=html||`<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin alertas activas</div></div>`;
 }
@@ -1119,7 +1119,7 @@ function buscarG(val){
   const q=val.toLowerCase();
   const todos=[...DB.cli().map(r=>({...r,_t:'cli'})),...DB.rev().map(r=>({...r,_t:'rev'})),...DB.prov().map(r=>({...r,_t:'prov'}))];
   const found=todos.filter(r=>(r.nombre+r.servicio+(r.emprendimiento||'')).toLowerCase().includes(q)).slice(0,8);
-  res.innerHTML=found.length?found.map(r=>`<div class="gresult" onclick="irA('${r._t}','${r.id}')"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
+  res.innerHTML=found.length?found.map(r=>`<div class="gresult" data-action="irA" data-t="${r._t}" data-id="${r.id}"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
   res.classList.add('show');
 }
 function irA(t,id){
@@ -1180,6 +1180,44 @@ function exportJSON(){const data={version:2,exportado:hoy(),cli:DB.cli(),rev:DB.
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.version){alert('Archivo inválido');return;}if(!confirm('¿Restaurar backup? Reemplazará todos los datos actuales.'))return;if(d.cli)SV.cli(d.cli);if(d.rev)SV.rev(d.rev);if(d.prov)SV.prov(d.prov);if(d.reemb)SV.reemb(d.reemb);// compat v1
 if(d.clientes)SV.cli(d.clientes);if(d.revendedores)SV.rev(d.revendedores);if(d.proveedores)SV.prov(d.proveedores);if(d.reembolsos)SV.reemb(d.reembolsos);badges();renderDash();alert('Backup restaurado ✓');}catch(err){alert('Error: '+err.message);}};r.readAsText(f);inp.value='';}
 function exportCSV(){const todos=[...DB.cli().map(r=>({...r,_tipo:'Cliente'})),...DB.rev().map(r=>({...r,_tipo:'Revendedor'}))];if(!todos.length){alert('Sin datos');return;}const cols=['_tipo','nombre','telefono','emprendimiento','servicio','opcion','slots','cobrado','pago','costo1','costor','primerMes','label','vence','fechaReg','notas'];const csv=[cols.join(','),...todos.map(r=>cols.map(c=>'"'+(r[c]!=null?String(r[c]).replace(/"/g,'""'):'')+'"').join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='novaverse_'+hoy()+'.csv';a.click();URL.revokeObjectURL(url);}
+
+
+// ── EVENT LISTENER GLOBAL (compatibilidad WebView Android) ───────
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  e.preventDefault();
+  const action = btn.dataset.action;
+  const tipo   = btn.dataset.tipo || null;
+  const id     = btn.dataset.id   || null;
+  const col    = btn.dataset.col  || null;
+  if(action==='openReg')      { openReg(tipo,id); return; }
+  if(action==='openProv')     { openProv(id); return; }
+  if(action==='openReemb')    { openReemb(id); return; }
+  if(action==='renovar')      { renovar(col,id); if(btn.dataset.dash)renderDash(); return; }
+  if(action==='waRec')        { waRec(col,id); return; }
+  if(action==='del')          { del(col,id); return; }
+  if(action==='saldar')       { saldar(id); if(btn.dataset.alertas)renderAlertas(); return; }
+  if(action==='setF')         { setF(btn.dataset.col,btn.dataset.val,btn); return; }
+  if(action==='setFR')        { setFR(btn.dataset.val,btn); return; }
+  if(action==='closeModal')   { closeModal(); return; }
+  if(action==='saveReg')      { saveReg(); return; }
+  if(action==='saveProv')     { saveProv(); return; }
+  if(action==='saveReemb')    { saveReemb(); return; }
+  if(action==='toggleTema')   { toggleTema(); return; }
+  if(action==='toggleNotas')  { toggleNotas(); return; }
+  if(action==='openCfgPin')   { openCfgPin(); return; }
+  if(action==='exportJSON')   { exportJSON(); return; }
+  if(action==='exportCSV')    { exportCSV(); return; }
+  if(action==='saveMeta')     { saveMeta(); return; }
+  if(action==='triggerImport'){ document.getElementById('imp-file').click(); return; }
+  if(action==='guardarPinCfg'){ guardarPinCfg(); return; }
+  if(action==='desactivarPin'){ desactivarPin(); return; }
+  if(action==='closePinCfg')  { closePinCfg(); return; }
+  if(action==='calNav')       { calNav(+btn.dataset.d); return; }
+  if(action==='irA')          { irA(btn.dataset.t,btn.dataset.id); return; }
+  if(action==='selMes')       { selMes(btn.dataset.mes); return; }
+});
 
 // ── INIT ──────────────────────────────────────────────────────────
 document.getElementById('notes-ta').value=localStorage.getItem('nv4_notas')||'';
