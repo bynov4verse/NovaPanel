@@ -3,22 +3,35 @@
   "short_name": "Nova Panel",
   "description": "Panel interno de gestión Novaverse",
   "start_url": "/panel/",
+  "scope": "/panel/",
   "display": "standalone",
   "background_color": "#08080f",
   "theme_color": "#be185d",
   "orientation": "portrait-primary",
+  "lang": "es",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "screenshots": []
 }
