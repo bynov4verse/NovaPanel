@@ -347,7 +347,7 @@ td strong{color:var(--text);font-weight:600}
     <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
     <button class="pkey" onclick="pk('back')">⌫</button><button class="pkey" onclick="pk('0')">0</button><button class="pkey ok-key" onclick="pk('ok')">OK</button>
   </div>
-  <span class="pin-link" onclick="openCfgPin()">Cambiar PIN · Sin PIN</span>
+  <span class="pin-link" data-action="openCfgPin">Cambiar PIN · Sin PIN</span>
 </div>
 
 <!-- Modal Config PIN -->
@@ -391,8 +391,8 @@ td strong{color:var(--text);font-weight:600}
   <div class="nav-item" data-page="calendario" onclick="goTo(this)"><span class="nav-icon">▦</span>Calendario</div>
   <div class="nav-item" data-page="alertas" onclick="goTo(this)"><span class="nav-icon">◬</span>Alertas<span class="nav-badge danger" id="b-alert">0</span></div>
   <div class="sidebar-footer">
-    <button class="sidebar-btn" onclick="toggleTema()"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
-    <button class="sidebar-btn" onclick="openCfgPin()"><span>⚿</span>Configurar PIN</button>
+    <button class="sidebar-btn" data-action="toggleTema"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
+    <button class="sidebar-btn" data-action="openCfgPin"><span>⚿</span>Configurar PIN</button>
   </div>
 </nav>
 
@@ -411,11 +411,11 @@ td strong{color:var(--text);font-weight:600}
     <div class="topbar">
       <div><div class="page-title">Dashboard</div><div class="page-sub">// resumen general · novaverse</div></div>
       <div class="btn-group">
-        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">↓ Backup JSON</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportJSON">↓ Backup JSON</button>
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp-file').click()">↑ Restaurar</button>
         <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
-        <button class="btn btn-ghost btn-sm" onclick="toggleTema()" id="tema-btn-top">☽</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
+        <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top">☽</button>
       </div>
     </div>
     <div class="stats">
@@ -444,7 +444,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-clientes">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--pink),#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Clientes</div><div class="page-sub">// canal clientes finales · rosa</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openReg('cliente')">+ Nuevo cliente</button>
+      <button class="btn btn-primary btn-sm" data-action="openReg" data-tipo="cliente">+ Nuevo cliente</button>
     </div>
     <div class="card" style="border-color:var(--cli-border)">
       <div class="card-head">
@@ -466,7 +466,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-revendedores">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--rev),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Revendedores</div><div class="page-sub">// canal mayorista · índigo</div></div>
-      <button class="btn btn-rev btn-sm" onclick="openReg('revendedor')">+ Nuevo revendedor</button>
+      <button class="btn btn-rev btn-sm" data-action="openReg" data-tipo="revendedor">+ Nuevo revendedor</button>
     </div>
     <div class="card" style="border-color:var(--rev-border)">
       <div class="card-head">
@@ -487,7 +487,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-proveedores">
     <div class="topbar">
       <div><div class="page-title">Proveedores</div><div class="page-sub">// costos mayoristas</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openProv()">+ Nuevo proveedor</button>
+      <button class="btn btn-primary btn-sm" data-action="openProv">+ Nuevo proveedor</button>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-title">todos los proveedores</span></div>
@@ -500,7 +500,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-reembolsos">
     <div class="topbar">
       <div><div class="page-title">Reembolsos</div><div class="page-sub">// deudas y compensaciones</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openReemb()">+ Registrar reembolso</button>
+      <button class="btn btn-primary btn-sm" data-action="openReemb">+ Registrar reembolso</button>
     </div>
     <div class="reemb-banner">Los reembolsos son deudas de períodos anteriores. <strong>No afectan los ingresos del mes actual</strong> — se registran aparte como ajuste contable del período de origen.</div>
     <div class="stats">
@@ -526,7 +526,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-contabilidad">
     <div class="topbar">
       <div><div class="page-title">Contabilidad</div><div class="page-sub">// ingresos · gastos · ganancias</div></div>
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+      <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
     <div class="stats">
@@ -564,7 +564,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- FAB NOTAS -->
-<button class="fab" onclick="toggleNotas()" title="Notas rápidas">✎</button>
+<button class="fab" data-action="toggleNotas" title="Notas rápidas">✎</button>
 <div class="notes-panel" id="notes-panel">
   <div class="notes-head">✎ Notas rápidas</div>
   <textarea class="notes-ta" id="notes-ta" placeholder="Anota algo al vuelo..." oninput="saveNotas()"></textarea>
@@ -572,7 +572,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- OVERLAY -->
-<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+<div class="overlay" id="overlay" id="overlay-bg">
 
   <!-- Modal Registro -->
   <div class="modal" id="m-reg" onclick="e=>e.stopPropagation()" style="display:none">
@@ -654,8 +654,8 @@ td strong{color:var(--text);font-weight:600}
       <div id="f-hist"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveReg()">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReg">Guardar</button>
     </div>
   </div>
 
@@ -683,8 +683,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Notas</label><input id="p-not" placeholder="Condiciones..."></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveProv()">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveProv">Guardar</button>
     </div>
   </div>
 
@@ -712,8 +712,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Motivo</label><textarea id="rb-mot" rows="2" placeholder="Describe el motivo..."></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveReemb()">Registrar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReemb">Registrar</button>
     </div>
   </div>
 
