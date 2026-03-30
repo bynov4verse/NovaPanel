@@ -433,7 +433,7 @@ function cfgPin(){openCfgPin();}
     <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
     <button class="pkey" onclick="pk('back')">⌫</button><button class="pkey" onclick="pk('0')">0</button><button class="pkey ok-key" onclick="pk('ok')">OK</button>
   </div>
-  <span class="pin-link" onclick="openCfgPin()">Cambiar PIN · Sin PIN</span>
+  <span class="pin-link" data-action="openCfgPin">Cambiar PIN · Sin PIN</span>
 </div>
 
 <div class="shell">
@@ -455,9 +455,9 @@ function cfgPin(){openCfgPin();}
   <div class="nav-item" data-page="calendario" onclick="goTo(this)"><span class="nav-icon">▦</span>Calendario</div>
   <div class="nav-item" data-page="alertas" onclick="goTo(this)"><span class="nav-icon">◬</span>Alertas<span class="nav-badge danger" id="b-alert">0</span></div>
   <div class="sidebar-footer">
-    <button class="sidebar-btn" onclick="abrirSheetsModal()"><span id="sheets-ico">⬡</span> Google Sheets</button>
-  <button class="sidebar-btn" onclick="toggleTema()"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
-    <button class="sidebar-btn" onclick="openCfgPin()"><span>⚿</span>Configurar PIN</button>
+    <button class="sidebar-btn" data-action="abrirSheetsModal"><span id="sheets-ico">⬡</span> Google Sheets</button>
+  <button class="sidebar-btn" data-action="toggleTema"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
+    <button class="sidebar-btn" data-action="openCfgPin"><span>⚿</span>Configurar PIN</button>
   </div>
 </nav>
 
@@ -476,11 +476,11 @@ function cfgPin(){openCfgPin();}
     <div class="topbar">
       <div><div class="page-title">Dashboard</div><div class="page-sub">// resumen general · novaverse</div></div>
       <div class="btn-group">
-        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">↓ Backup JSON</button>
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp-file').click()">↑ Restaurar</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportJSON">↓ Backup JSON</button>
+        <button class="btn btn-ghost btn-sm" data-action="triggerImport">↑ Restaurar</button>
         <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
-        <button class="btn btn-ghost btn-sm" onclick="toggleTema()" id="tema-btn-top">☽</button>
+        <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
+        <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top">☽</button>
       </div>
     </div>
     <div class="stats">
@@ -509,16 +509,16 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-clientes">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--pink),#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Clientes</div><div class="page-sub">// canal clientes finales · rosa</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openReg('cliente')">+ Nuevo cliente</button>
+      <button class="btn btn-primary btn-sm" data-action="openReg" data-tipo="cliente">+ Nuevo cliente</button>
     </div>
     <div class="card" style="border-color:var(--cli-border)">
       <div class="card-head">
         <span class="card-title">todos los clientes</span>
         <div class="filters">
-          <button class="filter-btn active" onclick="setF('clientes','todos',this)">Todos</button>
-          <button class="filter-btn" onclick="setF('clientes','activo',this)">Activos</button>
-          <button class="filter-btn" onclick="setF('clientes','por vencer',this)">Por vencer</button>
-          <button class="filter-btn" onclick="setF('clientes','vencido',this)">Vencidos</button>
+          <button class="filter-btn active" data-action="setF" data-col="clientes" data-val="todos">Todos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="activo">Activos</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="por vencer">Por vencer</button>
+          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="vencido">Vencidos</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('clientes',this.value)">
         </div>
       </div>
@@ -531,15 +531,15 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-revendedores">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--rev),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Revendedores</div><div class="page-sub">// canal mayorista · índigo</div></div>
-      <button class="btn btn-rev btn-sm" onclick="openReg('revendedor')">+ Nuevo revendedor</button>
+      <button class="btn btn-rev btn-sm" data-action="openReg" data-tipo="revendedor">+ Nuevo revendedor</button>
     </div>
     <div class="card" style="border-color:var(--rev-border)">
       <div class="card-head">
         <span class="card-title rev-title">todos los revendedores</span>
         <div class="filters">
-          <button class="filter-btn rev-filter active" onclick="setF('revendedores','todos',this)">Todos</button>
-          <button class="filter-btn rev-filter" onclick="setF('revendedores','activo',this)">Activos</button>
-          <button class="filter-btn rev-filter" onclick="setF('revendedores','por vencer',this)">Por vencer</button>
+          <button class="filter-btn rev-filter active" data-action="setF" data-col="revendedores" data-val="todos">Todos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="activo">Activos</button>
+          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="por vencer">Por vencer</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('revendedores',this.value)">
         </div>
       </div>
@@ -552,7 +552,7 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-proveedores">
     <div class="topbar">
       <div><div class="page-title">Proveedores</div><div class="page-sub">// costos mayoristas</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openProv()">+ Nuevo proveedor</button>
+      <button class="btn btn-primary btn-sm" data-action="openProv">+ Nuevo proveedor</button>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-title">todos los proveedores</span></div>
@@ -565,7 +565,7 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-reembolsos">
     <div class="topbar">
       <div><div class="page-title">Reembolsos</div><div class="page-sub">// deudas y compensaciones</div></div>
-      <button class="btn btn-primary btn-sm" onclick="openReemb()">+ Registrar reembolso</button>
+      <button class="btn btn-primary btn-sm" data-action="openReemb">+ Registrar reembolso</button>
     </div>
     <div class="reemb-banner">Los reembolsos son deudas de períodos anteriores. <strong>No afectan los ingresos del mes actual</strong> — se registran aparte como ajuste contable del período de origen.</div>
     <div class="stats">
@@ -577,9 +577,9 @@ function cfgPin(){openCfgPin();}
     <div class="card">
       <div class="card-head"><span class="card-title">registro de reembolsos</span>
         <div class="filters">
-          <button class="filter-btn active" onclick="setFR('todos',this)">Todos</button>
-          <button class="filter-btn" onclick="setFR('pendiente',this)">Pendientes</button>
-          <button class="filter-btn" onclick="setFR('saldado',this)">Saldados</button>
+          <button class="filter-btn active" data-action="setFR" data-val="todos">Todos</button>
+          <button class="filter-btn" data-action="setFR" data-val="pendiente">Pendientes</button>
+          <button class="filter-btn" data-action="setFR" data-val="saldado">Saldados</button>
         </div>
       </div>
       <table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
@@ -591,7 +591,7 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-contabilidad">
     <div class="topbar">
       <div><div class="page-title">Contabilidad</div><div class="page-sub">// ingresos · gastos · ganancias</div></div>
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+      <button class="btn btn-ghost btn-sm" data-action="exportCSV">↓ CSV</button>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
     <div class="stats">
@@ -611,9 +611,9 @@ function cfgPin(){openCfgPin();}
   <div class="page" id="page-calendario">
     <div class="topbar"><div><div class="page-title">Calendario</div><div class="page-sub">// vencimientos del mes</div></div></div>
     <div class="cal-nav">
-      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="-1">‹</button>
       <span class="cal-title" id="cal-title"></span>
-      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+      <button class="cal-nav-btn" data-action="calNav" data-d="1">›</button>
     </div>
     <div class="cal-grid" id="cal-heads"></div>
     <div class="cal-grid" id="cal-days"></div>
@@ -629,7 +629,7 @@ function cfgPin(){openCfgPin();}
 </div>
 
 <!-- FAB NOTAS -->
-<button class="fab" onclick="toggleNotas()" title="Notas rápidas">✎</button>
+<button class="fab" data-action="toggleNotas" title="Notas rápidas">✎</button>
 <div class="notes-panel" id="notes-panel">
   <div class="notes-head">✎ Notas rápidas</div>
   <textarea class="notes-ta" id="notes-ta" placeholder="Anota algo al vuelo..." oninput="saveNotas()"></textarea>
@@ -713,8 +713,8 @@ function cfgPin(){openCfgPin();}
       <div id="f-hist"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveReg()">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReg">Guardar</button>
     </div>
   </div>
 
@@ -742,8 +742,8 @@ function cfgPin(){openCfgPin();}
       <div class="field"><label>Notas</label><input id="p-not" placeholder="Condiciones..."></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveProv()">Guardar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveProv">Guardar</button>
     </div>
   </div>
 
@@ -771,8 +771,8 @@ function cfgPin(){openCfgPin();}
       <div class="field"><label>Motivo</label><textarea id="rb-mot" rows="2" placeholder="Describe el motivo..."></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="saveReemb()">Registrar</button>
+      <button class="btn btn-ghost btn-sm" data-action="closeModal">Cancelar</button>
+      <button class="btn btn-primary btn-sm" data-action="saveReemb">Registrar</button>
     </div>
   </div>
 
@@ -993,10 +993,10 @@ function renderTbl(col){
       <td class="mono" style="font-size:10px">${r.vence||'—'}<div style="color:${d<0?'var(--danger)':d<=3?'var(--warn)':'var(--text-dim)'};font-size:9px">${d<999?(d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'):'sin fecha'}</div></td>
       <td>${sB(e)}</td>
       <td><div class="actions">
-        <button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}')" title="Renovar">↺</button>
-        <button class="btn btn-warn btn-xs" onclick="waRec('${dbKey}','${r.id}')" title="Recordatorio WA">📱</button>
-        <button class="btn btn-ghost btn-xs" onclick="openReg('${isRev?'revendedor':'cliente'}','${r.id}')">✎</button>
-        <button class="btn btn-danger btn-xs" onclick="del('${dbKey}','${r.id}')">✕</button>
+        <button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" title="Renovar">↺</button>
+        <button class="btn btn-warn btn-xs" data-action="waRec" data-col="${dbKey}" data-id="${r.id}" title="WA">📱</button>
+        <button class="btn btn-ghost btn-xs" data-action="openReg" data-tipo="${isRev?'revendedor':'cliente'}" data-id="${r.id}">✎</button>
+        <button class="btn btn-danger btn-xs" data-action="del" data-col="${dbKey}" data-id="${r.id}">✕</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1008,7 +1008,7 @@ function renderProv(){
   if(!data.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin proveedores</div></div></td></tr>`;return;}
   tbody.innerHTML=data.map(p=>{
     const d=dR(p.pago);
-    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" onclick="openProv('${p.id}')">✎</button><button class="btn btn-danger btn-xs" onclick="del('prov','${p.id}')">✕</button></div></td></tr>`;
+    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" data-action="openProv" data-id="${p.id}">✎</button><button class="btn btn-danger btn-xs" data-action="del" data-col="prov" data-id="${p.id}">✕</button></div></td></tr>`;
   }).join('');
 }
 
@@ -1032,9 +1032,9 @@ function renderReemb(){
     <td>${sB(r.estado)}</td>
     <td class="mono" style="font-size:10px">${r.fechaSaldo||'—'}</td>
     <td><div class="actions">
-      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" onclick="saldar('${r.id}')">✓</button>`:''}
-      <button class="btn btn-ghost btn-xs" onclick="openReemb('${r.id}')">✎</button>
-      <button class="btn btn-danger btn-xs" onclick="del('reemb','${r.id}')">✕</button>
+      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}">✓</button>`:''}
+      <button class="btn btn-ghost btn-xs" data-action="openReemb" data-id="${r.id}">✎</button>
+      <button class="btn btn-danger btn-xs" data-action="del" data-col="reemb" data-id="${r.id}">✕</button>
     </div></td>
   </tr>`).join('');
 }
@@ -1055,7 +1055,7 @@ function renderDash(){
   const tbody=document.getElementById('dash-tbl');
   tbody.innerHTML=prox.length?prox.map(r=>{
     const d=dR(r.vence);const isRev=DB.rev().some(x=>x.id===r.id);const dbKey=isRev?'rev':'cli';
-    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}');renderDash()">↺</button></td></tr>`;
+    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" data-dash="1">↺</button></td></tr>`;
   }).join(''):`<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin vencimientos próximos</div></div></td></tr>`;
   // alertas
   const alV=todos.filter(r=>{const d=dR(r.vence);return d>=0&&d<=7;});
@@ -1082,7 +1082,7 @@ function renderCont(){
   const meses=[...new Set(todos.map(r=>mesYM(r.vence)).filter(Boolean))].sort().reverse();
   if(!meses.length){document.getElementById('month-tabs').innerHTML='<span class="mono" style="color:var(--text-dim);font-size:10px">Sin datos aún</span>';return;}
   if(!mesAct||!meses.includes(mesAct))mesAct=meses[0];
-  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" onclick="selMes('${m}')">${mesLbl(m)}</button>`).join('');
+  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" data-action="selMes" data-mes="${m}">${mesLbl(m)}</button>`).join('');
   const delMes=todos.filter(r=>mesYM(r.vence)===mesAct);
   const ing=delMes.reduce((s,r)=>s+(r.cobrado||0),0);
   const gas=delMes.reduce((s,r)=>s+(r.primerMes?r.costo1:r.costor)||0,0);
@@ -1136,7 +1136,7 @@ function renderAlertas(){
   const reemb=DB.reemb().filter(r=>r.estado==='pendiente');
   const grp=(label,items,cls='')=>!items.length?'':`<div style="margin-bottom:1.25rem"><div class="section-grp">${label} <span class="badge-count">${items.length}</span></div>${items.map(r=>{const d=dR(r.vence);return`<div class="alert-item ${cls} ${r._isRev?'rev':'info'}"><span>◬</span><div class="alert-text"><strong>${r.nombre}</strong> <span class="tag" style="margin-left:.25rem;${r._isRev?'color:var(--rev)':'color:var(--pink)'}">${r._isRev?'Rev.':'Cliente'}</span> · ${r.servicio}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.telefono||''}</span></div><span class="alert-days">${d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'}</span></div>`;}).join('')}</div>`;
   let html='';
-  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" onclick="saldar('${r.id}');renderAlertas()">✓</button></div>`).join('')}</div>`;
+  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" data-alertas="1">✓</button></div>`).join('')}</div>`;
   html+=grp('vencidos',venc,'danger')+grp('próximos 7 días',p7)+grp('próximos 30 días',p30);
   document.getElementById('lista-alertas').innerHTML=html||`<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin alertas activas</div></div>`;
 }
@@ -1172,7 +1172,7 @@ function buscarG(val){
   const q=val.toLowerCase();
   const todos=[...DB.cli().map(r=>({...r,_t:'cli'})),...DB.rev().map(r=>({...r,_t:'rev'})),...DB.prov().map(r=>({...r,_t:'prov'}))];
   const found=todos.filter(r=>(r.nombre+r.servicio+(r.emprendimiento||'')).toLowerCase().includes(q)).slice(0,8);
-  res.innerHTML=found.length?found.map(r=>`<div class="gresult" onclick="irA('${r._t}','${r.id}')"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
+  res.innerHTML=found.length?found.map(r=>`<div class="gresult" data-action="irA" data-t="${r._t}" data-id="${r.id}"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
   res.classList.add('show');
 }
 function irA(t,id){
@@ -1260,6 +1260,47 @@ function saveReemb(){_sRe();if(localStorage.getItem('nv4_sheets_url'))setTimeout
 function renovar(col,id){_ren(col,id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
 function del(col,id){_del(col,id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
 function saldar(id){_sal(id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+
+// ── EVENT LISTENER GLOBAL ────────────────────────────────────────
+document.addEventListener('click', function(e){
+  var btn=e.target.closest('[data-action]');
+  if(!btn)return;
+  var a=btn.getAttribute('data-action');
+  var id=btn.getAttribute('data-id');
+  var col=btn.getAttribute('data-col');
+  var tipo=btn.getAttribute('data-tipo');
+  var val=btn.getAttribute('data-val');
+  if(a==='openReg')       openReg(tipo,id||null);
+  else if(a==='openProv') openProv(id||null);
+  else if(a==='openReemb')openReemb(id||null);
+  else if(a==='saveReg')  saveReg();
+  else if(a==='saveProv') saveProv();
+  else if(a==='saveReemb')saveReemb();
+  else if(a==='closeModal')closeModal();
+  else if(a==='renovar')  {renovar(col,id);if(btn.getAttribute('data-dash'))renderDash();}
+  else if(a==='waRec')    waRec(col,id);
+  else if(a==='del')      del(col,id);
+  else if(a==='saldar')   {saldar(id);if(btn.getAttribute('data-alertas'))renderAlertas();}
+  else if(a==='setF')     setF(col,val,btn);
+  else if(a==='setFR')    setFR(val,btn);
+  else if(a==='calNav')   calNav(+btn.getAttribute('data-d'));
+  else if(a==='selMes')   selMes(btn.getAttribute('data-mes'));
+  else if(a==='irA')      irA(btn.getAttribute('data-t'),id);
+  else if(a==='toggleTema')  toggleTema();
+  else if(a==='toggleNotas') toggleNotas();
+  else if(a==='openCfgPin')  openCfgPin();
+  else if(a==='exportJSON')  exportJSON();
+  else if(a==='exportCSV')   exportCSV();
+  else if(a==='triggerImport')document.getElementById('imp-file').click();
+  else if(a==='abrirSheetsModal')abrirSheetsModal();
+  else if(a==='conectarSheets')  conectarSheets();
+  else if(a==='desconectarSheets')desconectarSheets();
+  else if(a==='cerrarSheets')    document.getElementById('overlay-sheets').style.display='none';
+  else if(a==='guardarPinCfg')   guardarPinCfg();
+  else if(a==='desactivarPinCfg')desactivarPinCfg();
+  else if(a==='cerrarPinCfg')    document.getElementById('overlay-pin-cfg').style.display='none';
+  else if(a==='saveMeta')        saveMeta();
+});
 </script>
 
 <!-- Modal Sheets -->
@@ -1273,9 +1314,9 @@ function saldar(id){_sal(id);if(localStorage.getItem('nv4_sheets_url'))setTimeou
     </div>
     <div id="sheets-status" style="font-family:var(--mono);font-size:9px;color:var(--success);margin-bottom:.75rem;display:none"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button onclick="desconectarSheets()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Desconectar</button>
-      <button onclick="document.getElementById('overlay-sheets').style.display='none'" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
-      <button onclick="conectarSheets()" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(190,24,93,.3)">Conectar y sincronizar</button>
+      <button data-action="desconectarSheets" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Desconectar</button>
+      <button data-action="cerrarSheets" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button data-action="conectarSheets" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(190,24,93,.3)">Conectar y sincronizar</button>
     </div>
   </div>
 </div>
@@ -1296,12 +1337,12 @@ function saldar(id){_sal(id);if(localStorage.getItem('nv4_sheets_url'))setTimeou
     </div>
     <div id="cfg-pin-err" style="font-family:var(--mono);font-size:10px;color:#f87171;min-height:14px;margin-bottom:.6rem"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button onclick="desactivarPinCfg()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Sin PIN</button>
-      <button onclick="document.getElementById('overlay-pin-cfg').style.display='none'" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
-      <button onclick="guardarPinCfg()" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Guardar PIN</button>
+      <button data-action="desactivarPinCfg" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Sin PIN</button>
+      <button data-action="cerrarPinCfg" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button data-action="guardarPinCfg" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Guardar PIN</button>
     </div>
   </div>
 </div>
 
 </body>
-</html>
+  </html>
