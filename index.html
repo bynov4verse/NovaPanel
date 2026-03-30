@@ -320,13 +320,100 @@ td strong{color:var(--text);font-weight:600}
   .growth-grid{grid-template-columns:1fr}
   .form-grid.three{grid-template-columns:1fr 1fr}
 }
-
-/* ── SHEETS CONFIG ── */
-.sheets-indicator{position:fixed;top:.75rem;right:1rem;font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;z-index:40;cursor:pointer;transition:all .15s}
-.sheets-on{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:var(--success)}
-.sheets-off{background:rgba(244,114,182,.08);border:1px solid var(--cli-border);color:var(--text-dim)}
-
 </style>
+<script>
+// Funciones disponibles antes del DOM
+function toggleBsWrap(){
+  var m=document.getElementById('f-moneda');
+  var w=document.getElementById('f-bs-wrap');
+  var c=document.getElementById('f-bcv-calc');
+  if(!m||!w)return;
+  w.style.display=m.value==='bs'?'grid':'none';
+  if(m.value!=='bs'&&c)c.style.display='none';
+}
+function calcBCV(){
+  var bs=parseFloat(document.getElementById('f-monto-bs').value)||0;
+  var t=parseFloat(document.getElementById('f-tasa-bcv').value)||0;
+  var c=document.getElementById('f-bcv-calc');
+  var f=document.getElementById('f-cobrado');
+  if(bs>0&&t>0){
+    var d=(bs/t).toFixed(2);
+    if(f)f.value=d;
+    if(c){c.style.display='block';c.textContent='Bs '+bs.toLocaleString('es-VE',{minimumFractionDigits:2})+' ÷ '+t+' = $'+d;}
+  }
+}
+function abrirSheetsModal(){
+  var url=localStorage.getItem('nv4_sheets_url')||'';
+  var inp=document.getElementById('sheets-url-inp');
+  var st=document.getElementById('sheets-status');
+  if(inp)inp.value=url;
+  if(st){st.style.display=url?'block':'none';st.textContent=url?'✓ Conectado: '+url.substring(0,45)+'...':'';}
+  document.getElementById('overlay-sheets').style.display='flex';
+}
+function conectarSheets(){
+  var url=document.getElementById('sheets-url-inp').value.trim();
+  if(!url||url.indexOf('script.google.com')<0){alert('URL inválida — debe ser URL de Google Apps Script');return;}
+  localStorage.setItem('nv4_sheets_url',url);
+  document.getElementById('overlay-sheets').style.display='none';
+  actualizarSheetsIco();
+  mostrarSync('Conectando con Sheets...','#fbbf24');
+  if(typeof loadFromSheets==='function')setTimeout(loadFromSheets,300);
+}
+function desconectarSheets(){
+  if(!confirm('¿Desconectar Google Sheets? Los datos locales no se borran.'))return;
+  localStorage.removeItem('nv4_sheets_url');
+  document.getElementById('overlay-sheets').style.display='none';
+  actualizarSheetsIco();
+  mostrarSync('Sheets desconectado','#fbbf24');
+}
+function actualizarSheetsIco(){
+  var el=document.getElementById('sheets-ico');if(!el)return;
+  var on=!!localStorage.getItem('nv4_sheets_url');
+  el.textContent=on?'✔':'⧡';
+  el.style.color=on?'#34d399':'';
+}
+function mostrarSync(msg,color){
+  var el=document.getElementById('sync-toast');
+  if(!el){
+    el=document.createElement('div');el.id='sync-toast';
+    el.style.cssText='position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);font-family:monospace;font-size:11px;padding:6px 14px;border-radius:20px;z-index:300;transition:opacity .5s;pointer-events:none;white-space:nowrap';
+    document.body.appendChild(el);
+  }
+  el.style.background='rgba(0,0,0,.8)';
+  el.style.color=color||'#34d399';
+  el.style.border='1px solid '+(color||'#34d399');
+  el.textContent=msg;el.style.opacity='1';
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.style.opacity='0';},3000);
+}
+
+function openCfgPin(){
+  var el=document.getElementById('overlay-pin-cfg');
+  var i1=document.getElementById('cfg-pin-1');
+  var i2=document.getElementById('cfg-pin-2');
+  var er=document.getElementById('cfg-pin-err');
+  if(i1)i1.value='';if(i2)i2.value='';if(er)er.textContent='';
+  if(el)el.style.display='flex';
+}
+function guardarPinCfg(){
+  var p1=document.getElementById('cfg-pin-1').value;
+  var p2=document.getElementById('cfg-pin-2').value;
+  var er=document.getElementById('cfg-pin-err');
+  if(!/^[0-9]{4}$/.test(p1)){er.textContent='El PIN debe tener exactamente 4 dígitos';return;}
+  if(p1!==p2){er.textContent='Los PINs no coinciden';return;}
+  localStorage.setItem('nv4_pin',p1);
+  document.getElementById('overlay-pin-cfg').style.display='none';
+  mostrarSync('✓ PIN configurado','#34d399');
+}
+function desactivarPinCfg(){
+  if(!confirm('¿Desactivar el PIN?'))return;
+  localStorage.removeItem('nv4_pin');
+  document.getElementById('overlay-pin-cfg').style.display='none';
+  mostrarSync('PIN desactivado','#fbbf24');
+}
+function cfgPin(){openCfgPin();}
+
+</script>
 </head>
 <body>
 
@@ -346,7 +433,7 @@ td strong{color:var(--text);font-weight:600}
     <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
     <button class="pkey" onclick="pk('back')">⌫</button><button class="pkey" onclick="pk('0')">0</button><button class="pkey ok-key" onclick="pk('ok')">OK</button>
   </div>
-  <span class="pin-link" onclick="cfgPin()">Cambiar PIN · Sin PIN</span>
+  <span class="pin-link" onclick="openCfgPin()">Cambiar PIN · Sin PIN</span>
 </div>
 
 <div class="shell">
@@ -368,9 +455,9 @@ td strong{color:var(--text);font-weight:600}
   <div class="nav-item" data-page="calendario" onclick="goTo(this)"><span class="nav-icon">▦</span>Calendario</div>
   <div class="nav-item" data-page="alertas" onclick="goTo(this)"><span class="nav-icon">◬</span>Alertas<span class="nav-badge danger" id="b-alert">0</span></div>
   <div class="sidebar-footer">
-    <button class="sidebar-btn" onclick="toggleTema()"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
-    <button class="sidebar-btn" onclick="abrirSheetsConfig()"><span>⬡</span>Google Sheets</button>
-  <button class="sidebar-btn" onclick="cfgPin()"><span>⚿</span>Configurar PIN</button>
+    <button class="sidebar-btn" onclick="abrirSheetsModal()"><span id="sheets-ico">⬡</span> Google Sheets</button>
+  <button class="sidebar-btn" onclick="toggleTema()"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
+    <button class="sidebar-btn" onclick="openCfgPin()"><span>⚿</span>Configurar PIN</button>
   </div>
 </nav>
 
@@ -592,6 +679,11 @@ td strong{color:var(--text);font-weight:600}
         </select>
       </div>
     </div>
+    <div class="form-grid" id="f-bs-wrap" style="display:none">
+      <div class="field"><label>Monto en Bs</label><input id="f-monto-bs" type="number" step="0.01" placeholder="0.00" oninput="calcBCV()"></div>
+      <div class="field"><label>Tasa BCV del día</label><input id="f-tasa-bcv" type="number" step="0.01" placeholder="468.51" oninput="calcBCV()"></div>
+    </div>
+    <div id="f-bcv-calc" style="display:none;font-family:var(--mono);font-size:10px;color:#34d399;padding:.4rem .7rem;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:8px;margin-bottom:.65rem"></div>
     <div class="form-grid">
       <div class="field"><label>Costo proveedor mes 1 ($)</label><input id="f-c1" type="number" step="0.01" placeholder="0.00"></div>
       <div class="field"><label>Costo renovación ($)</label><input id="f-cr" type="number" step="0.01" placeholder="0.00"></div>
@@ -600,6 +692,14 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>¿Es primera vez?</label>
         <select id="f-pv"><option value="1">Sí — primer mes</option><option value="0">No — renovación</option></select>
       </div>
+      <div class="field"><label>Moneda de cobro</label>
+        <select id="f-moneda" onchange="toggleBsWrap()">
+          <option value="usd">$ Dólares / USDT</option>
+          <option value="bs">Bs (tasa BCV)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid">
       <div class="field"><label>Etiqueta</label>
         <select id="f-lbl"><option value="">Sin etiqueta</option><option value="vip">★ VIP</option><option value="nuevo">● Nuevo</option><option value="fiel">◆ Fiel</option><option value="prob">▲ Problemático</option></select>
       </div>
@@ -739,6 +839,10 @@ function openReg(tipo,id=null){
   document.getElementById('f-svc').value=r?r.servicio||'':'';
   document.getElementById('f-opt').value=r?r.opcion||'':'';
   document.getElementById('f-slots').value=r?r.slots||1:1;
+  document.getElementById('f-moneda').value=r?r.moneda||'usd':'usd';
+  document.getElementById('f-monto-bs').value=r?r.montoBs||'':'';
+  document.getElementById('f-tasa-bcv').value=r?r.tasaBCV||'':'';
+  if(typeof toggleBsWrap==='function')toggleBsWrap();
   document.getElementById('f-meses').value=r?r.meses||1:1;
   document.getElementById('f-vence').value=r?r.vence||'':'';
   document.getElementById('f-cobrado').value=r?r.cobrado||'':'';
@@ -793,6 +897,9 @@ function saveReg(){
     slots:+document.getElementById('f-slots').value||1,
     meses:+document.getElementById('f-meses').value||1,
     cobrado:+document.getElementById('f-cobrado').value||0,
+    moneda:document.getElementById('f-moneda').value||'usd',
+    montoBs:parseFloat(document.getElementById('f-monto-bs').value)||0,
+    tasaBCV:parseFloat(document.getElementById('f-tasa-bcv').value)||0,
     pago:document.getElementById('f-pago').value,
     costo1:+document.getElementById('f-c1').value||0,
     costor:+document.getElementById('f-cr').value||0,
@@ -1090,7 +1197,7 @@ let pinBuf='';
 function initPin(){const p=localStorage.getItem('nv4_pin');if(!p)return;document.getElementById('pin-overlay').style.display='flex';pinBuf='';rdots();}
 function pk(k){const p=localStorage.getItem('nv4_pin');if(k==='back'){pinBuf=pinBuf.slice(0,-1);}else if(k==='ok'||pinBuf.length===4){if(k!=='ok')pinBuf+=k;if(pinBuf===p){document.getElementById('pin-overlay').style.display='none';}else{document.getElementById('pin-error').textContent='PIN incorrecto';pinBuf='';setTimeout(()=>document.getElementById('pin-error').textContent='',1500);}}else if(pinBuf.length<4){pinBuf+=k;}rdots();if(pinBuf.length===4&&k!=='ok')pk('ok');}
 function rdots(){for(let i=0;i<4;i++){const el=document.getElementById('pd'+i);if(el)el.classList.toggle('filled',i<pinBuf.length);}}
-function cfgPin(){const n=prompt('Nuevo PIN de 4 dígitos (vacío para desactivar):');if(n===null)return;if(n===''){localStorage.removeItem('nv4_pin');alert('PIN desactivado');}else if(/^\d{4}$/.test(n)){localStorage.setItem('nv4_pin',n);alert('PIN configurado ✓');}else alert('Debe tener 4 dígitos');}
+// cfgPin movida al head
 
 // ── NOTAS ─────────────────────────────────────────────────────────
 function toggleNotas(){document.getElementById('notes-panel').classList.toggle('open');}
@@ -1100,8 +1207,10 @@ function saveNotas(){localStorage.setItem('nv4_notas',document.getElementById('n
 function exportJSON(){const data={version:2,exportado:hoy(),cli:DB.cli(),rev:DB.rev(),prov:DB.prov(),reemb:DB.reemb()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='novaverse_backup_'+hoy()+'.json';a.click();URL.revokeObjectURL(url);}
 function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.version){alert('Archivo inválido');return;}if(!confirm('¿Restaurar backup? Reemplazará todos los datos actuales.'))return;if(d.cli)SV.cli(d.cli);if(d.rev)SV.rev(d.rev);if(d.prov)SV.prov(d.prov);if(d.reemb)SV.reemb(d.reemb);// compat v1
 if(d.clientes)SV.cli(d.clientes);if(d.revendedores)SV.rev(d.revendedores);if(d.proveedores)SV.prov(d.proveedores);if(d.reembolsos)SV.reemb(d.reembolsos);badges();renderDash();
-actualizarIndicadorSheets();
-if(sheetsEnabled()) loadFromSheets();alert('Backup restaurado ✓');}catch(err){alert('Error: '+err.message);}};r.readAsText(f);inp.value='';}
+actualizarSheetsIco();
+if(localStorage.getItem('nv4_sheets_url'))setTimeout(loadFromSheets,500);
+actualizarSheetsIco();
+if(localStorage.getItem('nv4_sheets_url'))setTimeout(loadFromSheets,500);alert('Backup restaurado ✓');}catch(err){alert('Error: '+err.message);}};r.readAsText(f);inp.value='';}
 function exportCSV(){const todos=[...DB.cli().map(r=>({...r,_tipo:'Cliente'})),...DB.rev().map(r=>({...r,_tipo:'Revendedor'}))];if(!todos.length){alert('Sin datos');return;}const cols=['_tipo','nombre','telefono','emprendimiento','servicio','opcion','slots','cobrado','pago','costo1','costor','primerMes','label','vence','fechaReg','notas'];const csv=[cols.join(','),...todos.map(r=>cols.map(c=>'"'+(r[c]!=null?String(r[c]).replace(/"/g,'""'):'')+'"').join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='novaverse_'+hoy()+'.csv';a.click();URL.revokeObjectURL(url);}
 
 // ── INIT ──────────────────────────────────────────────────────────
@@ -1110,30 +1219,89 @@ initTema();
 initPin();
 badges();
 renderDash();
-actualizarIndicadorSheets();
-if(sheetsEnabled()) loadFromSheets();
+actualizarSheetsIco();
+if(localStorage.getItem('nv4_sheets_url'))setTimeout(loadFromSheets,500);
+
+
+// ── GOOGLE SHEETS SYNC ────────────────────────────────────────────
+function loadFromSheets(){
+  var url=localStorage.getItem('nv4_sheets_url');
+  if(!url)return;
+  window._sheetsCb=function(data){
+    var sc=document.getElementById('_sc_load');if(sc)sc.remove();
+    if(data&&data.ok){
+      if(data.cli)SV.cli(data.cli);
+      if(data.rev)SV.rev(data.rev);
+      if(data.prov)SV.prov(data.prov);
+      if(data.reemb)SV.reemb(data.reemb);
+      badges();renderDash();
+      mostrarSync('✓ Sincronizado','#34d399');
+    } else { mostrarSync('⚠ Sin conexión a Sheets','#fbbf24'); }
+  };
+  var sc=document.createElement('script');sc.id='_sc_load';
+  sc.src=url+'?action=getAll&callback=_sheetsCb';
+  document.head.appendChild(sc);
+}
+function saveToSheets(){
+  var url=localStorage.getItem('nv4_sheets_url');if(!url)return;
+  var data={cli:DB.cli(),rev:DB.rev(),prov:DB.prov(),reemb:DB.reemb()};
+  window._sheetsSaveCb=function(r){
+    var sc=document.getElementById('_sc_save');if(sc)sc.remove();
+    mostrarSync(r&&r.ok?'✓ Guardado':'Error','#'+(r&&r.ok?'34d399':'f87171'));
+  };
+  var sc=document.createElement('script');sc.id='_sc_save';
+  sc.src=url+'?action=saveAll&callback=_sheetsSaveCb&data='+encodeURIComponent(JSON.stringify(data));
+  document.head.appendChild(sc);
+}
+var _sR=saveReg,_sP=saveProv,_sRe=saveReemb,_ren=renovar,_del=del,_sal=saldar;
+function saveReg(){_sR();if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+function saveProv(){_sP();if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+function saveReemb(){_sRe();if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+function renovar(col,id){_ren(col,id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+function del(col,id){_del(col,id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
+function saldar(id){_sal(id);if(localStorage.getItem('nv4_sheets_url'))setTimeout(saveToSheets,400);}
 </script>
 
-<!-- Modal Sheets Config -->
-<div class="overlay" id="overlay-sheets" onclick="if(event.target===this)this.style.display='none'" style="display:none">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:480px">
-    <div class="modal-title">Conectar Google Sheets</div>
-    <div class="info-box">Pega la URL de tu Apps Script del panel para sincronizar todos los datos en la nube. Una vez conectado, cualquier dispositivo que abra el panel verá los mismos datos.</div>
-    <div class="field" style="margin-bottom:.75rem">
-      <label>URL del Apps Script</label>
-      <input id="sheets-url-inp" placeholder="https://script.google.com/macros/s/..." style="font-family:var(--mono);font-size:11px">
+<!-- Modal Sheets -->
+<div id="overlay-sheets" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--bg2);border:1px solid var(--border-hi);border-radius:14px;padding:1.75rem;width:100%;max-width:480px;box-shadow:0 0 60px rgba(190,24,93,.2)" onclick="event.stopPropagation()">
+    <div style="font-size:18px;font-weight:800;margin-bottom:1rem;background:linear-gradient(135deg,var(--pink-bright),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Conectar Google Sheets</div>
+    <div style="background:rgba(244,114,182,.06);border:1px solid rgba(244,114,182,.18);border-radius:8px;padding:.6rem .85rem;font-size:12px;color:var(--text-muted);line-height:1.55;margin-bottom:.75rem">Pega la URL de tu Apps Script para sincronizar datos en la nube. Cualquier dispositivo verá los mismos datos.</div>
+    <div style="display:flex;flex-direction:column;gap:.25rem;margin-bottom:.75rem">
+      <label style="font-family:var(--mono);font-size:8px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase">URL del Apps Script</label>
+      <input id="sheets-url-inp" placeholder="https://script.google.com/macros/s/..." style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.55rem .8rem;font-family:var(--mono);font-size:11px;color:var(--text);outline:none;width:100%">
     </div>
-    <div id="sheets-url-actual" style="font-family:var(--mono);font-size:9px;color:var(--success);margin-bottom:.75rem;display:none"></div>
+    <div id="sheets-status" style="font-family:var(--mono);font-size:9px;color:var(--success);margin-bottom:.75rem;display:none"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" onclick="desconectarSheets()">Desconectar</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('overlay-sheets').style.display='none'">Cancelar</button>
-      <button class="btn btn-primary btn-sm" onclick="conectarSheets()" style="margin-left:auto">Conectar y sincronizar</button>
+      <button onclick="desconectarSheets()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Desconectar</button>
+      <button onclick="document.getElementById('overlay-sheets').style.display='none'" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="conectarSheets()" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(190,24,93,.3)">Conectar y sincronizar</button>
     </div>
   </div>
 </div>
 
-<!-- Indicador Sheets -->
-<div class="sheets-indicator sheets-off" id="sheets-indicator" onclick="abrirSheetsConfig()">⬡ Sheets</div>
+
+<!-- Modal Config PIN -->
+<div id="overlay-pin-cfg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--bg2);border:1px solid var(--border-hi);border-radius:14px;padding:1.75rem;width:100%;max-width:340px;box-shadow:0 0 60px rgba(190,24,93,.2)" onclick="event.stopPropagation()">
+    <div style="font-size:17px;font-weight:800;margin-bottom:1rem;background:linear-gradient(135deg,var(--pink-bright),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Configurar PIN</div>
+    <div style="background:rgba(244,114,182,.06);border:1px solid rgba(244,114,182,.18);border-radius:8px;padding:.6rem .85rem;font-size:12px;color:var(--text-muted);line-height:1.55;margin-bottom:.75rem">PIN de 4 dígitos para proteger el panel. Déjalo vacío para desactivarlo.</div>
+    <div style="display:flex;flex-direction:column;gap:.25rem;margin-bottom:.6rem">
+      <label style="font-family:var(--mono);font-size:8px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase">Nuevo PIN</label>
+      <input id="cfg-pin-1" type="password" maxlength="4" placeholder="••••" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:24px;letter-spacing:.4em;text-align:center;color:var(--text);outline:none;width:100%" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.25rem;margin-bottom:.75rem">
+      <label style="font-family:var(--mono);font-size:8px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase">Confirmar PIN</label>
+      <input id="cfg-pin-2" type="password" maxlength="4" placeholder="••••" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.6rem;font-size:24px;letter-spacing:.4em;text-align:center;color:var(--text);outline:none;width:100%" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    </div>
+    <div id="cfg-pin-err" style="font-family:var(--mono);font-size:10px;color:#f87171;min-height:14px;margin-bottom:.6rem"></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button onclick="desactivarPinCfg()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Sin PIN</button>
+      <button onclick="document.getElementById('overlay-pin-cfg').style.display='none'" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="guardarPinCfg()" style="margin-left:auto;background:linear-gradient(135deg,var(--pink-dim),#7c3aed);border:1px solid rgba(244,114,182,.4);color:#fff;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:600;cursor:pointer">Guardar PIN</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
