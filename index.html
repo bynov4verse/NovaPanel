@@ -4,14 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novaverse · Panel</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Nova Panel">
-  <meta name="theme-color" content="#be185d">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ── DARK THEME (default) ── */
 :root {
@@ -328,6 +321,28 @@ td strong{color:var(--text);font-weight:600}
   .form-grid.three{grid-template-columns:1fr 1fr}
 }
 </style>
+
+<script>
+function toggleBsWrap(){
+  var moneda=document.getElementById('f-moneda');
+  var wrap=document.getElementById('f-bs-wrap');
+  var calc=document.getElementById('f-bcv-calc');
+  if(!moneda||!wrap)return;
+  wrap.style.display=moneda.value==='bs'?'grid':'none';
+  if(moneda.value!=='bs'&&calc)calc.style.display='none';
+}
+function calcBCV(){
+  var bs=parseFloat(document.getElementById('f-monto-bs').value)||0;
+  var tasa=parseFloat(document.getElementById('f-tasa-bcv').value)||0;
+  var calc=document.getElementById('f-bcv-calc');
+  var fcob=document.getElementById('f-cobrado');
+  if(bs>0&&tasa>0){
+    var d=(bs/tasa).toFixed(2);
+    if(fcob)fcob.value=d;
+    if(calc){calc.style.display='block';calc.textContent='Bs. '+bs.toLocaleString('es-VE',{minimumFractionDigits:2})+' ÷ '+tasa+' = $'+d;}
+  }
+}
+</script>
 </head>
 <body>
 
@@ -347,29 +362,7 @@ td strong{color:var(--text);font-weight:600}
     <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
     <button class="pkey" onclick="pk('back')">⌫</button><button class="pkey" onclick="pk('0')">0</button><button class="pkey ok-key" onclick="pk('ok')">OK</button>
   </div>
-  <span class="pin-link" data-action="openCfgPin" onclick="window._btn(this)">Cambiar PIN · Sin PIN</span>
-</div>
-
-<!-- Modal Config PIN -->
-<div class="overlay" id="overlay-pin" onclick="closePinCfg(event)" style="display:none">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:340px">
-    <div class="modal-title">Configurar PIN</div>
-    <div class="info-box">Ingresa un PIN de 4 dígitos para proteger el panel. Déjalo vacío para desactivarlo.</div>
-    <div class="field" style="margin-bottom:.75rem">
-      <label>Nuevo PIN (4 dígitos)</label>
-      <input id="cfg-pin-inp" type="password" maxlength="4" placeholder="1234" style="font-size:20px;letter-spacing:.3em;text-align:center" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-    </div>
-    <div class="field" style="margin-bottom:1rem">
-      <label>Confirmar PIN</label>
-      <input id="cfg-pin-conf" type="password" maxlength="4" placeholder="1234" style="font-size:20px;letter-spacing:.3em;text-align:center" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-    </div>
-    <div id="cfg-pin-err" style="font-family:var(--mono);font-size:10px;color:var(--danger);margin-bottom:.75rem;min-height:14px"></div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" data-action="desactivarPin" onclick="window._btn(this)">Sin PIN</button>
-      <button class="btn btn-ghost btn-sm" data-action="closePinCfg" onclick="window._btn(this)">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="guardarPinCfg" style="margin-left:auto" onclick="window._btn(this)">Guardar PIN</button>
-    </div>
-  </div>
+  <span class="pin-link" onclick="cfgPin()">Cambiar PIN · Sin PIN</span>
 </div>
 
 <div class="shell">
@@ -391,8 +384,8 @@ td strong{color:var(--text);font-weight:600}
   <div class="nav-item" data-page="calendario" onclick="goTo(this)"><span class="nav-icon">▦</span>Calendario</div>
   <div class="nav-item" data-page="alertas" onclick="goTo(this)"><span class="nav-icon">◬</span>Alertas<span class="nav-badge danger" id="b-alert">0</span></div>
   <div class="sidebar-footer">
-    <button class="sidebar-btn" data-action="toggleTema" onclick="window._btn(this)"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
-    <button class="sidebar-btn" data-action="openCfgPin" onclick="window._btn(this)"><span>⚿</span>Configurar PIN</button>
+    <button class="sidebar-btn" onclick="toggleTema()"><span id="tema-ico">☽</span><span id="tema-lbl">Modo claro</span></button>
+    <button class="sidebar-btn" onclick="cfgPin()"><span>⚿</span>Configurar PIN</button>
   </div>
 </nav>
 
@@ -411,11 +404,11 @@ td strong{color:var(--text);font-weight:600}
     <div class="topbar">
       <div><div class="page-title">Dashboard</div><div class="page-sub">// resumen general · novaverse</div></div>
       <div class="btn-group">
-        <button class="btn btn-ghost btn-sm" data-action="exportJSON" onclick="window._btn(this)">↓ Backup JSON</button>
-        <button class="btn btn-ghost btn-sm" data-action="triggerImport" onclick="window._btn(this)">↑ Restaurar</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">↓ Backup JSON</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp-file').click()">↑ Restaurar</button>
         <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importJSON(this)">
-        <button class="btn btn-ghost btn-sm" data-action="exportCSV" onclick="window._btn(this)">↓ CSV</button>
-        <button class="btn btn-ghost btn-sm" data-action="toggleTema" id="tema-btn-top" onclick="window._btn(this)">☽</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleTema()" id="tema-btn-top">☽</button>
       </div>
     </div>
     <div class="stats">
@@ -444,16 +437,16 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-clientes">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--pink),#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Clientes</div><div class="page-sub">// canal clientes finales · rosa</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openReg" data-tipo="cliente" onclick="window._btn(this)">+ Nuevo cliente</button>
+      <button class="btn btn-primary btn-sm" onclick="openReg('cliente')">+ Nuevo cliente</button>
     </div>
     <div class="card" style="border-color:var(--cli-border)">
       <div class="card-head">
         <span class="card-title">todos los clientes</span>
         <div class="filters">
-          <button class="filter-btn active" data-action="setF" data-col="clientes" data-val="todos" onclick="window._btn(this)">Todos</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="activo" onclick="window._btn(this)">Activos</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="por vencer" onclick="window._btn(this)">Por vencer</button>
-          <button class="filter-btn" data-action="setF" data-col="clientes" data-val="vencido" onclick="window._btn(this)">Vencidos</button>
+          <button class="filter-btn active" onclick="setF('clientes','todos',this)">Todos</button>
+          <button class="filter-btn" onclick="setF('clientes','activo',this)">Activos</button>
+          <button class="filter-btn" onclick="setF('clientes','por vencer',this)">Por vencer</button>
+          <button class="filter-btn" onclick="setF('clientes','vencido',this)">Vencidos</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('clientes',this.value)">
         </div>
       </div>
@@ -466,15 +459,15 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-revendedores">
     <div class="topbar">
       <div><div class="page-title" style="background:linear-gradient(135deg,var(--rev),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Revendedores</div><div class="page-sub">// canal mayorista · índigo</div></div>
-      <button class="btn btn-rev btn-sm" data-action="openReg" data-tipo="revendedor" onclick="window._btn(this)">+ Nuevo revendedor</button>
+      <button class="btn btn-rev btn-sm" onclick="openReg('revendedor')">+ Nuevo revendedor</button>
     </div>
     <div class="card" style="border-color:var(--rev-border)">
       <div class="card-head">
         <span class="card-title rev-title">todos los revendedores</span>
         <div class="filters">
-          <button class="filter-btn rev-filter active" data-action="setF" data-col="revendedores" data-val="todos" onclick="window._btn(this)">Todos</button>
-          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="activo" onclick="window._btn(this)">Activos</button>
-          <button class="filter-btn rev-filter" data-action="setF" data-col="revendedores" data-val="por vencer" onclick="window._btn(this)">Por vencer</button>
+          <button class="filter-btn rev-filter active" onclick="setF('revendedores','todos',this)">Todos</button>
+          <button class="filter-btn rev-filter" onclick="setF('revendedores','activo',this)">Activos</button>
+          <button class="filter-btn rev-filter" onclick="setF('revendedores','por vencer',this)">Por vencer</button>
           <input class="search-inp" placeholder="Buscar..." oninput="setS('revendedores',this.value)">
         </div>
       </div>
@@ -487,7 +480,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-proveedores">
     <div class="topbar">
       <div><div class="page-title">Proveedores</div><div class="page-sub">// costos mayoristas</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openProv" onclick="window._btn(this)">+ Nuevo proveedor</button>
+      <button class="btn btn-primary btn-sm" onclick="openProv()">+ Nuevo proveedor</button>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-title">todos los proveedores</span></div>
@@ -500,7 +493,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-reembolsos">
     <div class="topbar">
       <div><div class="page-title">Reembolsos</div><div class="page-sub">// deudas y compensaciones</div></div>
-      <button class="btn btn-primary btn-sm" data-action="openReemb" onclick="window._btn(this)">+ Registrar reembolso</button>
+      <button class="btn btn-primary btn-sm" onclick="openReemb()">+ Registrar reembolso</button>
     </div>
     <div class="reemb-banner">Los reembolsos son deudas de períodos anteriores. <strong>No afectan los ingresos del mes actual</strong> — se registran aparte como ajuste contable del período de origen.</div>
     <div class="stats">
@@ -512,9 +505,9 @@ td strong{color:var(--text);font-weight:600}
     <div class="card">
       <div class="card-head"><span class="card-title">registro de reembolsos</span>
         <div class="filters">
-          <button class="filter-btn active" data-action="setFR" data-val="todos" onclick="window._btn(this)">Todos</button>
-          <button class="filter-btn" data-action="setFR" data-val="pendiente" onclick="window._btn(this)">Pendientes</button>
-          <button class="filter-btn" data-action="setFR" data-val="saldado" onclick="window._btn(this)">Saldados</button>
+          <button class="filter-btn active" onclick="setFR('todos',this)">Todos</button>
+          <button class="filter-btn" onclick="setFR('pendiente',this)">Pendientes</button>
+          <button class="filter-btn" onclick="setFR('saldado',this)">Saldados</button>
         </div>
       </div>
       <table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
@@ -526,7 +519,7 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-contabilidad">
     <div class="topbar">
       <div><div class="page-title">Contabilidad</div><div class="page-sub">// ingresos · gastos · ganancias</div></div>
-      <button class="btn btn-ghost btn-sm" data-action="exportCSV" onclick="window._btn(this)">↓ CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
     <div class="stats">
@@ -546,9 +539,9 @@ td strong{color:var(--text);font-weight:600}
   <div class="page" id="page-calendario">
     <div class="topbar"><div><div class="page-title">Calendario</div><div class="page-sub">// vencimientos del mes</div></div></div>
     <div class="cal-nav">
-      <button class="cal-nav-btn" data-action="calNav" data-d="-1" onclick="window._btn(this)">‹</button>
+      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
       <span class="cal-title" id="cal-title"></span>
-      <button class="cal-nav-btn" data-action="calNav" data-d="1" onclick="window._btn(this)">›</button>
+      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
     </div>
     <div class="cal-grid" id="cal-heads"></div>
     <div class="cal-grid" id="cal-days"></div>
@@ -564,7 +557,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- FAB NOTAS -->
-<button class="fab" data-action="toggleNotas" title="Notas rápidas" onclick="window._btn(this)">✎</button>
+<button class="fab" onclick="toggleNotas()" title="Notas rápidas">✎</button>
 <div class="notes-panel" id="notes-panel">
   <div class="notes-head">✎ Notas rápidas</div>
   <textarea class="notes-ta" id="notes-ta" placeholder="Anota algo al vuelo..." oninput="saveNotas()"></textarea>
@@ -572,7 +565,7 @@ td strong{color:var(--text);font-weight:600}
 </div>
 
 <!-- OVERLAY -->
-<div class="overlay" id="overlay">
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
 
   <!-- Modal Registro -->
   <div class="modal" id="m-reg" onclick="e=>e.stopPropagation()" style="display:none">
@@ -614,17 +607,11 @@ td strong{color:var(--text);font-weight:600}
         </select>
       </div>
     </div>
-    <div class="form-grid" id="f-bs-row">
-      <div class="field">
-        <label>Monto cobrado en Bs (opcional)</label>
-        <input id="f-monto-bs" type="number" step="0.01" placeholder="0.00" oninput="calcDolarBCV()">
-      </div>
-      <div class="field">
-        <label>Tasa BCV usada</label>
-        <input id="f-tasa-bcv" type="number" step="0.01" placeholder="468.51" oninput="calcDolarBCV()">
-      </div>
+    <div class="form-grid" id="f-bs-wrap" style="display:none">
+      <div class="field"><label>Monto cobrado en Bs</label><input id="f-monto-bs" type="number" step="0.01" placeholder="0.00" oninput="calcBCV()"></div>
+      <div class="field"><label>Tasa BCV del día</label><input id="f-tasa-bcv" type="number" step="0.01" placeholder="468.51" oninput="calcBCV()"></div>
     </div>
-    <div id="f-bcv-preview" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);margin-bottom:.65rem;padding:.4rem .7rem;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:var(--r)"></div>
+    <div id="f-bcv-calc" style="display:none;font-family:var(--mono);font-size:10px;color:var(--success);padding:.4rem .7rem;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:8px;margin-bottom:.65rem"></div>
     <div class="form-grid">
       <div class="field"><label>Costo proveedor mes 1 ($)</label><input id="f-c1" type="number" step="0.01" placeholder="0.00"></div>
       <div class="field"><label>Costo renovación ($)</label><input id="f-cr" type="number" step="0.01" placeholder="0.00"></div>
@@ -634,7 +621,7 @@ td strong{color:var(--text);font-weight:600}
         <select id="f-pv"><option value="1">Sí — primer mes</option><option value="0">No — renovación</option></select>
       </div>
       <div class="field"><label>Moneda de cobro</label>
-        <select id="f-moneda" onchange="toggleBsRow()">
+        <select id="f-moneda" onchange="toggleBsWrap()">
           <option value="usd">$ Dólares / USDT</option>
           <option value="bs">Bs (tasa BCV)</option>
         </select>
@@ -654,8 +641,8 @@ td strong{color:var(--text);font-weight:600}
       <div id="f-hist"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveReg" onclick="window._btn(this)">Guardar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveReg()">Guardar</button>
     </div>
   </div>
 
@@ -683,8 +670,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Notas</label><input id="p-not" placeholder="Condiciones..."></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveProv" onclick="window._btn(this)">Guardar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProv()">Guardar</button>
     </div>
   </div>
 
@@ -712,8 +699,8 @@ td strong{color:var(--text);font-weight:600}
       <div class="field"><label>Motivo</label><textarea id="rb-mot" rows="2" placeholder="Describe el motivo..."></textarea></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" data-action="closeModal" onclick="window._btn(this)">Cancelar</button>
-      <button class="btn btn-primary btn-sm" data-action="saveReemb" onclick="window._btn(this)">Registrar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="saveReemb()">Registrar</button>
     </div>
   </div>
 
@@ -783,7 +770,7 @@ function openReg(tipo,id=null){
   document.getElementById('f-moneda').value=r?r.moneda||'usd':'usd';
   document.getElementById('f-monto-bs').value=r?r.montoBs||'':'';
   document.getElementById('f-tasa-bcv').value=r?r.tasaBCV||'':'';
-  toggleBsRow();
+  toggleBsWrap();
   document.getElementById('f-meses').value=r?r.meses||1:1;
   document.getElementById('f-vence').value=r?r.vence||'':'';
   document.getElementById('f-cobrado').value=r?r.cobrado||'':'';
@@ -839,8 +826,8 @@ function saveReg(){
     meses:+document.getElementById('f-meses').value||1,
     cobrado:+document.getElementById('f-cobrado').value||0,
     moneda:document.getElementById('f-moneda').value||'usd',
-    montoBs:+document.getElementById('f-monto-bs').value||0,
-    tasaBCV:+document.getElementById('f-tasa-bcv').value||0,
+    montoBs:parseFloat(document.getElementById('f-monto-bs').value)||0,
+    tasaBCV:parseFloat(document.getElementById('f-tasa-bcv').value)||0,
     pago:document.getElementById('f-pago').value,
     costo1:+document.getElementById('f-c1').value||0,
     costor:+document.getElementById('f-cr').value||0,
@@ -927,17 +914,17 @@ function renderTbl(col){
       <td><strong>${r.servicio||'—'}</strong></td>
       <td style="font-size:12px;color:var(--text-muted);max-width:120px">${r.opcion||'—'}</td>
       ${!isRev?`<td style="text-align:center" class="mono">${r.slots||1}</td>`:''}
-      <td class="profit">${fmt(r.cobrado)}${r.moneda==='bs'&&r.tasaBCV?'<div class="mono" style="font-size:9px;color:var(--text-dim)">BCV '+r.tasaBCV+'</div>':''}</td>
+      <td class="profit">${fmt(r.cobrado)}</td>
       <td class="loss">${fmt(c)}</td>
       <td class="${g>=0?'profit':'loss'}">${fmt(g)}</td>
       <td>${pagoIco}</td>
       <td class="mono" style="font-size:10px">${r.vence||'—'}<div style="color:${d<0?'var(--danger)':d<=3?'var(--warn)':'var(--text-dim)'};font-size:9px">${d<999?(d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'):'sin fecha'}</div></td>
       <td>${sB(e)}</td>
       <td><div class="actions">
-        <button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" title="Renovar" onclick="window._btn(this)">↺</button>
-        <button class="btn btn-warn btn-xs" data-action="waRec" data-col="${dbKey}" data-id="${r.id}" title="WA" onclick="window._btn(this)">📱</button>
-        <button class="btn btn-ghost btn-xs" data-action="openReg" data-tipo="${isRev?'revendedor':'cliente'}" data-id="${r.id}" onclick="window._btn(this)">✎</button>
-        <button class="btn btn-danger btn-xs" data-action="del" data-col="${dbKey}" data-id="${r.id}" onclick="window._btn(this)">✕</button>
+        <button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}')" title="Renovar">↺</button>
+        <button class="btn btn-warn btn-xs" onclick="waRec('${dbKey}','${r.id}')" title="Recordatorio WA">📱</button>
+        <button class="btn btn-ghost btn-xs" onclick="openReg('${isRev?'revendedor':'cliente'}','${r.id}')">✎</button>
+        <button class="btn btn-danger btn-xs" onclick="del('${dbKey}','${r.id}')">✕</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -949,7 +936,7 @@ function renderProv(){
   if(!data.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin proveedores</div></div></td></tr>`;return;}
   tbody.innerHTML=data.map(p=>{
     const d=dR(p.pago);
-    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" data-action="openProv" data-id="${p.id}" onclick="window._btn(this)">✎</button><button class="btn btn-danger btn-xs" data-action="del" data-col="prov" data-id="${p.id}" onclick="window._btn(this)">✕</button></div></td></tr>`;
+    return `<tr><td><strong>${p.nombre}</strong></td><td><span class="tag">${p.servicio||'—'}</span></td><td class="loss">${fmt(p.costo1)}</td><td class="neutral">${fmt(p.costor)}</td><td class="mono" style="font-size:10px">${p.pago||'—'} ${d>=0&&d<=7?sB('por vencer'):d<0?sB('vencido'):''}</td><td class="mono" style="font-size:10px">${p.contacto||'—'}</td><td style="font-size:11px;color:var(--text-muted)">${p.notas||'—'}</td><td><div class="actions"><button class="btn btn-ghost btn-xs" onclick="openProv('${p.id}')">✎</button><button class="btn btn-danger btn-xs" onclick="del('prov','${p.id}')">✕</button></div></td></tr>`;
   }).join('');
 }
 
@@ -973,9 +960,9 @@ function renderReemb(){
     <td>${sB(r.estado)}</td>
     <td class="mono" style="font-size:10px">${r.fechaSaldo||'—'}</td>
     <td><div class="actions">
-      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" onclick="window._btn(this)">✓</button>`:''}
-      <button class="btn btn-ghost btn-xs" data-action="openReemb" data-id="${r.id}" onclick="window._btn(this)">✎</button>
-      <button class="btn btn-danger btn-xs" data-action="del" data-col="reemb" data-id="${r.id}" onclick="window._btn(this)">✕</button>
+      ${r.estado==='pendiente'?`<button class="btn btn-success btn-xs" onclick="saldar('${r.id}')">✓</button>`:''}
+      <button class="btn btn-ghost btn-xs" onclick="openReemb('${r.id}')">✎</button>
+      <button class="btn btn-danger btn-xs" onclick="del('reemb','${r.id}')">✕</button>
     </div></td>
   </tr>`).join('');
 }
@@ -996,7 +983,7 @@ function renderDash(){
   const tbody=document.getElementById('dash-tbl');
   tbody.innerHTML=prox.length?prox.map(r=>{
     const d=dR(r.vence);const isRev=DB.rev().some(x=>x.id===r.id);const dbKey=isRev?'rev':'cli';
-    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" data-action="renovar" data-col="${dbKey}" data-id="${r.id}" data-dash="1" onclick="window._btn(this)">↺</button></td></tr>`;
+    return `<tr><td><strong>${r.nombre}</strong></td><td><span class="${isRev?'tag':'tag'}" style="${isRev?'color:var(--rev);border-color:var(--rev-border)':'color:var(--pink);border-color:var(--cli-border)'}">${isRev?'Rev.':'Cliente'}</span></td><td>${r.servicio||'—'}</td><td class="mono" style="font-size:10px">${r.vence}</td><td class="mono" style="color:${d<=3?'var(--danger)':'var(--gold)'}">${d}d</td><td>${sB(est(r.vence))}</td><td><button class="btn btn-success btn-xs" onclick="renovar('${dbKey}','${r.id}');renderDash()">↺</button></td></tr>`;
   }).join(''):`<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin vencimientos próximos</div></div></td></tr>`;
   // alertas
   const alV=todos.filter(r=>{const d=dR(r.vence);return d>=0&&d<=7;});
@@ -1023,7 +1010,7 @@ function renderCont(){
   const meses=[...new Set(todos.map(r=>mesYM(r.vence)).filter(Boolean))].sort().reverse();
   if(!meses.length){document.getElementById('month-tabs').innerHTML='<span class="mono" style="color:var(--text-dim);font-size:10px">Sin datos aún</span>';return;}
   if(!mesAct||!meses.includes(mesAct))mesAct=meses[0];
-  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" data-action="selMes" data-mes="${m}" onclick="window._btn(this)">${mesLbl(m)}</button>`).join('');
+  document.getElementById('month-tabs').innerHTML=meses.map(m=>`<button class="month-tab ${m===mesAct?'active':''}" onclick="selMes('${m}')">${mesLbl(m)}</button>`).join('');
   const delMes=todos.filter(r=>mesYM(r.vence)===mesAct);
   const ing=delMes.reduce((s,r)=>s+(r.cobrado||0),0);
   const gas=delMes.reduce((s,r)=>s+(r.primerMes?r.costo1:r.costor)||0,0);
@@ -1042,13 +1029,7 @@ function renderCont(){
   const porSvc={};delMes.forEach(r=>{if(!porSvc[r.servicio])porSvc[r.servicio]={ing:0};porSvc[r.servicio].ing+=r.cobrado||0;});
   const maxI=Math.max(...Object.values(porSvc).map(v=>v.ing),1);
   document.getElementById('chart-svc').innerHTML=Object.entries(porSvc).sort((a,b)=>b[1].ing-a[1].ing).map(([s,v])=>`<div class="bar-row"><span class="bar-label">${s}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v.ing/maxI*100)}%"></div></div><span class="bar-val">${fmt(v.ing)}</span></div>`).join('');
-  document.getElementById('det-mes').innerHTML=delMes.length?delMes.map(r=>{
-    const g=gan(r);
-    const isCli=DB.cli().some(x=>x.id===r.id);
-    const monedaTag=r.moneda==='bs'?'<span class="tag" style="font-size:8px;margin-left:.2rem">BCV</span>':'';
-    const tipoTag=`<span class="tag" style="font-size:8px;margin-left:.2rem;${isCli?'color:var(--pink)':'color:var(--rev)'}">${isCli?'CLI':'REV'}</span>`;
-    return`<div class="acc-row"><span>${r.nombre} · ${r.servicio}${tipoTag}${monedaTag}</span><span class="${g>=0?'profit':'loss'}">${fmt(r.cobrado)}</span></div>`;
-  }).join(''):'<div class="mono" style="color:var(--text-dim);font-size:10px;padding:.5rem 0">Sin registros</div>';
+  document.getElementById('det-mes').innerHTML=delMes.length?delMes.map(r=>{const g=gan(r);return`<div class="acc-row"><span>${r.nombre} · ${r.servicio}</span><span class="${g>=0?'profit':'loss'}">${fmt(r.cobrado)}</span></div>`;}).join(''):'<div class="mono" style="color:var(--text-dim);font-size:10px;padding:.5rem 0">Sin registros</div>';
 }
 function selMes(m){mesAct=m;renderCont();}
 
@@ -1083,7 +1064,7 @@ function renderAlertas(){
   const reemb=DB.reemb().filter(r=>r.estado==='pendiente');
   const grp=(label,items,cls='')=>!items.length?'':`<div style="margin-bottom:1.25rem"><div class="section-grp">${label} <span class="badge-count">${items.length}</span></div>${items.map(r=>{const d=dR(r.vence);return`<div class="alert-item ${cls} ${r._isRev?'rev':'info'}"><span>◬</span><div class="alert-text"><strong>${r.nombre}</strong> <span class="tag" style="margin-left:.25rem;${r._isRev?'color:var(--rev)':'color:var(--pink)'}">${r._isRev?'Rev.':'Cliente'}</span> · ${r.servicio}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.telefono||''}</span></div><span class="alert-days">${d<0?'hace '+Math.abs(d)+'d':d===0?'hoy':d+'d'}</span></div>`;}).join('')}</div>`;
   let html='';
-  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" data-action="saldar" data-id="${r.id}" data-alertas="1" onclick="window._btn(this)">✓</button></div>`).join('')}</div>`;
+  if(reemb.length)html+=`<div style="margin-bottom:1.25rem"><div class="section-grp">reembolsos pendientes <span class="badge-count">${reemb.length}</span></div>${reemb.map(r=>`<div class="alert-item info"><span>◬</span><div class="alert-text"><strong>${r.cliente}</strong> · ${r.servicio} · ${fmt(r.monto)}<br><span class="mono" style="font-size:9px;color:var(--text-dim)">${r.motivo||''}</span></div><button class="btn btn-success btn-xs" onclick="saldar('${r.id}');renderAlertas()">✓</button></div>`).join('')}</div>`;
   html+=grp('vencidos',venc,'danger')+grp('próximos 7 días',p7)+grp('próximos 30 días',p30);
   document.getElementById('lista-alertas').innerHTML=html||`<div class="empty"><div class="empty-icon">◎</div><div class="empty-text">sin alertas activas</div></div>`;
 }
@@ -1119,7 +1100,7 @@ function buscarG(val){
   const q=val.toLowerCase();
   const todos=[...DB.cli().map(r=>({...r,_t:'cli'})),...DB.rev().map(r=>({...r,_t:'rev'})),...DB.prov().map(r=>({...r,_t:'prov'}))];
   const found=todos.filter(r=>(r.nombre+r.servicio+(r.emprendimiento||'')).toLowerCase().includes(q)).slice(0,8);
-  res.innerHTML=found.length?found.map(r=>`<div class="gresult" data-action="irA" data-t="${r._t}" data-id="${r.id}" onclick="window._btn(this)"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
+  res.innerHTML=found.length?found.map(r=>`<div class="gresult" onclick="irA('${r._t}','${r.id}')"><span class="gresult-type ${r._t==='rev'?'rev':'cli'}">${r._t==='cli'?'Cliente':r._t==='rev'?'Rev.':'Prov.'}</span><span class="gresult-name">${r.nombre}</span><span class="gresult-sub">${r.servicio||''}</span></div>`).join(''):'<div class="gresult" style="color:var(--text-dim);font-family:var(--mono);font-size:10px">Sin resultados</div>';
   res.classList.add('show');
 }
 function irA(t,id){
@@ -1144,32 +1125,7 @@ let pinBuf='';
 function initPin(){const p=localStorage.getItem('nv4_pin');if(!p)return;document.getElementById('pin-overlay').style.display='flex';pinBuf='';rdots();}
 function pk(k){const p=localStorage.getItem('nv4_pin');if(k==='back'){pinBuf=pinBuf.slice(0,-1);}else if(k==='ok'||pinBuf.length===4){if(k!=='ok')pinBuf+=k;if(pinBuf===p){document.getElementById('pin-overlay').style.display='none';}else{document.getElementById('pin-error').textContent='PIN incorrecto';pinBuf='';setTimeout(()=>document.getElementById('pin-error').textContent='',1500);}}else if(pinBuf.length<4){pinBuf+=k;}rdots();if(pinBuf.length===4&&k!=='ok')pk('ok');}
 function rdots(){for(let i=0;i<4;i++){const el=document.getElementById('pd'+i);if(el)el.classList.toggle('filled',i<pinBuf.length);}}
-function cfgPin(){openCfgPin();}
-function openCfgPin(){
-  document.getElementById('cfg-pin-inp').value='';
-  document.getElementById('cfg-pin-conf').value='';
-  document.getElementById('cfg-pin-err').textContent='';
-  document.getElementById('overlay-pin').style.display='flex';
-}
-function closePinCfg(e){
-  if(!e||e.target===document.getElementById('overlay-pin'))
-    document.getElementById('overlay-pin').style.display='none';
-}
-function guardarPinCfg(){
-  const p1=document.getElementById('cfg-pin-inp').value;
-  const p2=document.getElementById('cfg-pin-conf').value;
-  const err=document.getElementById('cfg-pin-err');
-  if(!/^\d{4}$/.test(p1)){err.textContent='El PIN debe tener exactamente 4 dígitos';return;}
-  if(p1!==p2){err.textContent='Los PINs no coinciden';return;}
-  localStorage.setItem('nv4_pin',p1);
-  document.getElementById('overlay-pin').style.display='none';
-  alert('PIN configurado correctamente ✓');
-}
-function desactivarPin(){
-  localStorage.removeItem('nv4_pin');
-  document.getElementById('overlay-pin').style.display='none';
-  alert('PIN desactivado');
-}
+function cfgPin(){const n=prompt('Nuevo PIN de 4 dígitos (vacío para desactivar):');if(n===null)return;if(n===''){localStorage.removeItem('nv4_pin');alert('PIN desactivado');}else if(/^\d{4}$/.test(n)){localStorage.setItem('nv4_pin',n);alert('PIN configurado ✓');}else alert('Debe tener 4 dígitos');}
 
 // ── NOTAS ─────────────────────────────────────────────────────────
 function toggleNotas(){document.getElementById('notes-panel').classList.toggle('open');}
@@ -1181,99 +1137,12 @@ function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
 if(d.clientes)SV.cli(d.clientes);if(d.revendedores)SV.rev(d.revendedores);if(d.proveedores)SV.prov(d.proveedores);if(d.reembolsos)SV.reemb(d.reembolsos);badges();renderDash();alert('Backup restaurado ✓');}catch(err){alert('Error: '+err.message);}};r.readAsText(f);inp.value='';}
 function exportCSV(){const todos=[...DB.cli().map(r=>({...r,_tipo:'Cliente'})),...DB.rev().map(r=>({...r,_tipo:'Revendedor'}))];if(!todos.length){alert('Sin datos');return;}const cols=['_tipo','nombre','telefono','emprendimiento','servicio','opcion','slots','cobrado','pago','costo1','costor','primerMes','label','vence','fechaReg','notas'];const csv=[cols.join(','),...todos.map(r=>cols.map(c=>'"'+(r[c]!=null?String(r[c]).replace(/"/g,'""'):'')+'"').join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='novaverse_'+hoy()+'.csv';a.click();URL.revokeObjectURL(url);}
 
-
-// ── EVENT LISTENER GLOBAL (compatibilidad WebView Android) ───────
-document.addEventListener('click', function(e){
-  const btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  e.preventDefault();
-  const action = btn.dataset.action;
-  const tipo   = btn.dataset.tipo || null;
-  const id     = btn.dataset.id   || null;
-  const col    = btn.dataset.col  || null;
-  if(action==='openReg')      { openReg(tipo,id); return; }
-  if(action==='openProv')     { openProv(id); return; }
-  if(action==='openReemb')    { openReemb(id); return; }
-  if(action==='renovar')      { renovar(col,id); if(btn.dataset.dash)renderDash(); return; }
-  if(action==='waRec')        { waRec(col,id); return; }
-  if(action==='del')          { del(col,id); return; }
-  if(action==='saldar')       { saldar(id); if(btn.dataset.alertas)renderAlertas(); return; }
-  if(action==='setF')         { setF(btn.dataset.col,btn.dataset.val,btn); return; }
-  if(action==='setFR')        { setFR(btn.dataset.val,btn); return; }
-  if(action==='closeModal')   { closeModal(); return; }
-  if(action==='saveReg')      { saveReg(); return; }
-  if(action==='saveProv')     { saveProv(); return; }
-  if(action==='saveReemb')    { saveReemb(); return; }
-  if(action==='toggleTema')   { toggleTema(); return; }
-  if(action==='toggleNotas')  { toggleNotas(); return; }
-  if(action==='openCfgPin')   { openCfgPin(); return; }
-  if(action==='exportJSON')   { exportJSON(); return; }
-  if(action==='exportCSV')    { exportCSV(); return; }
-  if(action==='saveMeta')     { saveMeta(); return; }
-  if(action==='triggerImport'){ document.getElementById('imp-file').click(); return; }
-  if(action==='guardarPinCfg'){ guardarPinCfg(); return; }
-  if(action==='desactivarPin'){ desactivarPin(); return; }
-  if(action==='closePinCfg')  { closePinCfg(); return; }
-  if(action==='calNav')       { calNav(+btn.dataset.d); return; }
-  if(action==='irA')          { irA(btn.dataset.t,btn.dataset.id); return; }
-  if(action==='selMes')       { selMes(btn.dataset.mes); return; }
-});
-
 // ── INIT ──────────────────────────────────────────────────────────
 document.getElementById('notes-ta').value=localStorage.getItem('nv4_notas')||'';
 initTema();
 initPin();
 badges();
 renderDash();
-</script>
-
-  <script>
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/panel/sw.js')
-          .then(r => console.log('SW registrado:', r.scope))
-          .catch(e => console.warn('SW error:', e));
-      });
-    }
-  
-// ── EXPONER FUNCIONES EN WINDOW (compatibilidad WebView Android) ──
-window._btn = function(el) {
-  var action = el.getAttribute('data-action');
-  var tipo   = el.getAttribute('data-tipo');
-  var id     = el.getAttribute('data-id');
-  var col    = el.getAttribute('data-col');
-  var val    = el.getAttribute('data-val');
-  var d      = el.getAttribute('data-d');
-  var mes    = el.getAttribute('data-mes');
-  var t      = el.getAttribute('data-t');
-  if(action==='openReg')      openReg(tipo, id||null);
-  else if(action==='openProv')     openProv(id||null);
-  else if(action==='openReemb')    openReemb(id||null);
-  else if(action==='renovar')      { renovar(col,id); if(el.getAttribute('data-dash'))renderDash(); }
-  else if(action==='waRec')        waRec(col,id);
-  else if(action==='del')          del(col,id);
-  else if(action==='saldar')       { saldar(id); if(el.getAttribute('data-alertas'))renderAlertas(); }
-  else if(action==='setF')         setF(col,val,el);
-  else if(action==='setFR')        setFR(val,el);
-  else if(action==='closeModal')   closeModal();
-  else if(action==='saveReg')      saveReg();
-  else if(action==='saveProv')     saveProv();
-  else if(action==='saveReemb')    saveReemb();
-  else if(action==='toggleTema')   toggleTema();
-  else if(action==='toggleNotas')  toggleNotas();
-  else if(action==='openCfgPin')   openCfgPin();
-  else if(action==='exportJSON')   exportJSON();
-  else if(action==='exportCSV')    exportCSV();
-  else if(action==='saveMeta')     saveMeta();
-  else if(action==='triggerImport') document.getElementById('imp-file').click();
-  else if(action==='guardarPinCfg') guardarPinCfg();
-  else if(action==='desactivarPin') desactivarPin();
-  else if(action==='closePinCfg')   closePinCfg();
-  else if(action==='calNav')        calNav(+d);
-  else if(action==='selMes')        selMes(mes);
-  else if(action==='irA')           irA(t,id);
-};
-
 </script>
 </body>
 </html>
