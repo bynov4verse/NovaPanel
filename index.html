@@ -22,17 +22,29 @@ function cerrarModal(){G('overlay').style.display='none';}
 
 function toggleBsWrap(){
   var m=G('f-moneda'),w=G('f-bs-wrap'),c=G('f-bcv-calc');
+  var w2=G('f-p2p-wrap'),c2=G('f-usdt-calc');
   if(!m||!w)return;
-  w.style.display=m.value==='bs'?'grid':'none';
-  if(m.value!=='bs'&&c)c.style.display='none';
+  var isBs=m.value==='bs';
+  w.style.display=isBs?'grid':'none';
+  if(w2)w2.style.display=isBs?'grid':'none';
+  if(!isBs&&c)c.style.display='none';
+  if(!isBs&&c2)c2.style.display='none';
 }
 function calcBCV(){
-  var bs=parseFloat(GV('f-monto-bs'))||0,t=parseFloat(GV('f-tasa-bcv'))||0;
-  var c=G('f-bcv-calc'),f=G('f-cobrado');
-  if(bs>0&&t>0){
-    var d=(bs/t).toFixed(2);
-    if(f)f.value=d;
-    if(c){c.style.display='block';c.textContent='Bs '+bs.toFixed(2)+' ÷ '+t+' = $'+d;}
+  var bs=parseFloat(GV('f-monto-bs'))||0;
+  var tBCV=parseFloat(GV('f-tasa-bcv'))||0;
+  var tP2P=parseFloat(GV('f-tasa-p2p'))||0;
+  var c=G('f-bcv-calc'),f=G('f-cobrado'),c2=G('f-usdt-calc');
+  if(bs>0&&tBCV>0){
+    var dBCV=(bs/tBCV).toFixed(2);
+    if(f)f.value=dBCV;
+    if(c){c.style.display='block';c.textContent='Bs '+bs.toFixed(2)+' ÷ BCV '+tBCV+' = $'+dBCV+' (tasa BCV)';}
+    if(tP2P>0&&c2){
+      var dP2P=(bs/tP2P).toFixed(2);
+      var diff=(dBCV-dP2P).toFixed(2);
+      c2.style.display='block';
+      c2.textContent='Equivalencia real: Bs '+bs.toFixed(2)+' ÷ P2P '+tP2P+' = $'+dP2P+' USDT  |  diferencia: $'+diff;
+    }
   }
 }
 function toast(msg,color){
@@ -332,6 +344,17 @@ td b{color:var(--tx);font-weight:600}
     <div class="stat s-ok"><div class="stat-lbl">Ingresos mes</div><div class="stat-val" id="d-ing">$0</div><div class="stat-sub">cobrado</div></div>
     <div class="stat s-w"><div class="stat-lbl">Ganancia neta</div><div class="stat-val" id="d-gan">$0</div><div class="stat-sub">después de costos</div></div>
   </div>
+  <!-- Tasas en tiempo real -->
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
+    <div style="font-family:var(--mono);font-size:9px;background:var(--bg2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:.4rem" id="tasa-bcv-badge">
+      <span style="color:var(--td)">BCV</span><span style="color:var(--pk)" id="tasa-bcv-val">cargando...</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;background:var(--bg2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:.4rem" id="tasa-p2p-badge">
+      <span style="color:var(--td)">P2P USDT</span><span style="color:var(--rv)" id="tasa-p2p-val">cargando...</span>
+    </div>
+    <button class="btn btn-gh btn-sm" onclick="cargarTasas()" style="font-size:9px;padding:3px 8px">↻ Actualizar tasas</button>
+    <button class="btn btn-gh btn-sm" onclick="usarTasasEnForm()" style="font-size:9px;padding:3px 8px">↳ Usar en formulario</button>
+  </div>
   <div class="meta">
     <div class="meta-row">
       <div><div class="meta-lbl">Meta mensual</div><div class="meta-vals"><span id="meta-act">$0</span> / <span id="meta-obj">$0</span></div></div>
@@ -434,6 +457,7 @@ td b{color:var(--tx);font-weight:600}
     <div class="stat s-pk"><div class="stat-lbl">Ganancia neta</div><div class="stat-val" id="c-gan">$0</div></div>
     <div class="stat s-w"><div class="stat-lbl">Margen %</div><div class="stat-val" id="c-mar">0%</div></div>
   </div>
+  <div id="cont-nota-fija" style="display:none;font-family:var(--mono);font-size:9px;color:var(--warn);padding:.4rem .8rem;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:6px;margin-bottom:1rem"></div>
   <div class="acc-grid">
     <div class="acc-card"><div class="acc-title">por servicio</div><div id="ch-svc"></div></div>
     <div class="acc-card"><div class="acc-title">detalle del mes</div><div id="det-mes"></div></div>
@@ -485,14 +509,17 @@ td b{color:var(--tx);font-weight:600}
   <div class="sec-lbl" id="m-sec2">Servicio</div>
   <div class="fg">
     <div class="field"><label>Servicio</label>
-      <select id="f-svc"><option value="">— Selecciona —</option>
+      <select id="f-svc" onchange="onSvcChange()"><option value="">— Selecciona —</option>
         <option>Netflix</option><option>Disney+</option><option>HBOMAX</option><option>Prime Video</option>
         <option>Crunchyroll</option><option>Canva</option><option>Apple TV</option><option>Paramount+</option>
         <option>CapCut</option><option>ChatGPT</option><option>Spotify Premium</option><option>FlujoTV</option>
-        <option>YouTube Premium</option><option>Claude AI</option><option>Otro</option>
+        <option>YouTube Premium</option><option>Claude AI</option><option>Recargas / Juegos</option><option>Otro</option>
       </select>
     </div>
-    <div class="field"><label>Opción / Plan</label><input id="f-opt" placeholder="Perfil normal"></div>
+    <div class="field"><label>Opción / Plan</label>
+      <select id="f-opt-sel" style="display:none" onchange="onOptChange()"><option value="">— Selecciona opción —</option></select>
+      <input id="f-opt" placeholder="Perfil normal" style="display:block">
+    </div>
   </div>
   <div class="fg fg3">
     <div class="field"><label>Clientes en slot</label><input id="f-slots" type="number" min="1" max="6" value="1"></div>
@@ -514,6 +541,10 @@ td b{color:var(--tx);font-weight:600}
     <div class="field"><label>Monto en Bs</label><input id="f-monto-bs" type="number" step="0.01" placeholder="0.00" oninput="calcBCV()"></div>
     <div class="field"><label>Tasa BCV del día</label><input id="f-tasa-bcv" type="number" step="0.01" placeholder="468.51" oninput="calcBCV()"></div>
   </div>
+  <div class="fg" id="f-p2p-wrap" style="display:none">
+    <div class="field"><label>Tasa P2P del día (para equivalencia real USDT)</label><input id="f-tasa-p2p" type="number" step="0.01" placeholder="524.00" oninput="calcBCV()"></div>
+    <div id="f-usdt-calc" class="calc-preview" style="display:none"></div>
+  </div>
   <div class="calc-preview" id="f-bcv-calc"></div>
   <div class="fg">
     <div class="field"><label>Método de pago</label>
@@ -524,6 +555,7 @@ td b{color:var(--tx);font-weight:600}
     </div>
     <div class="field"><label>Costo proveedor mes 1 ($)</label><input id="f-c1" type="number" step="0.01" placeholder="0.00"></div>
   </div>
+  <div id="f-costo-nota" style="display:none;font-family:var(--mono);font-size:9px;color:var(--warn);padding:.3rem .6rem;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:6px;margin-bottom:.6rem"></div>
   <div class="fg">
     <div class="field"><label>Costo renovación ($)</label><input id="f-cr" type="number" step="0.01" placeholder="0.00"></div>
     <div class="field"><label>¿Es primera vez?</label>
@@ -686,6 +718,15 @@ function abrirReg(tipo,id){
   G('f-tel').value=r?r.telefono||'':'';
   G('f-emp').value=r?r.emprendimiento||'':'';
   G('f-svc').value=r?r.servicio||'':'';
+  onSvcChange();
+  if(r&&r.opcion){
+    var optSel=G('f-opt-sel');
+    if(optSel&&optSel.style.display!=='none'){
+      optSel.value=r.opcion;
+      if(!optSel.value){G('f-opt-sel').style.display='none';G('f-opt').style.display='block';}
+    }
+    G('f-opt').value=r.opcion||'';
+  }
   G('f-opt').value=r?r.opcion||'':'';
   G('f-slots').value=r?r.slots||1:1;
   G('f-meses').value=r?r.meses||1:1;
@@ -693,7 +734,7 @@ function abrirReg(tipo,id){
   G('f-cobrado').value=r?r.cobrado||'':'';
   G('f-moneda').value=r?r.moneda||'usd':'usd';
   G('f-monto-bs').value=r?r.montoBs||'':'';
-  G('f-tasa-bcv').value=r?r.tasaBCV||'':'';
+  G('f-tasa-bcv').value=r?r.tasaBCV||'':"";  G('f-tasa-p2p').value=r?r.tasaP2P||'':"";
   G('f-pago').value=r?r.pago||'':'';
   G('f-c1').value=r?r.costo1||'':'';
   G('f-cr').value=r?r.costor||'':'';
@@ -745,6 +786,7 @@ function guardarReg(){
     opcion:G('f-opt').value.trim(),slots:+G('f-slots').value||1,
     meses:+G('f-meses').value||1,cobrado:+G('f-cobrado').value||0,
     moneda:G('f-moneda').value||'usd',
+    tasaP2P:parseFloat(G('f-tasa-p2p').value)||0,
     montoBs:parseFloat(G('f-monto-bs').value)||0,
     tasaBCV:parseFloat(G('f-tasa-bcv').value)||0,
     pago:G('f-pago').value,costo1:+G('f-c1').value||0,
@@ -858,7 +900,7 @@ function renderTbl(col){
       +'<td><b>'+( r.servicio||'—')+'</b></td>'
       +'<td style="font-size:11px;color:var(--tm)">'+( r.opcion||'—')+'</td>'
       +(!isRev?'<td class="mono" style="text-align:center">'+( r.slots||1)+'</td>':'')
-      +'<td class="g">'+fmt(r.cobrado)+'</td>'
+      +'<td class="g">'+fmt(r.cobrado)+(r.moneda==='bs'&&r.tasaP2P>0&&r.montoBs>0?'<div class="mono" style="color:var(--warn);font-size:9px">≈$'+(r.montoBs/r.tasaP2P).toFixed(2)+' USDT</div>':'')+'</td>'
       +'<td class="r">'+fmt(c)+'</td>'
       +'<td class="'+(g>=0?'g':'r')+'">'+fmt(g)+'</td>'
       +'<td>'+pagoH+'</td>'
@@ -968,10 +1010,15 @@ function renderCont(){
   var gas=delMes.reduce(function(s,r){return s+(r.primerMes?r.costo1:r.costor)||0;},0);
   var gn=ing-gas,mar=ing>0?Math.round(gn/ing*100):0;
   G('c-ing').textContent=fmt(ing);G('c-gas').textContent=fmt(gas);G('c-gan').textContent=fmt(gn);G('c-mar').textContent=mar+'%';
+  // Nota de costo fijo mensual de plataforma
+  var notaEl=G('cont-nota-fija');
+  if(notaEl){notaEl.style.display='block';notaEl.textContent='⚠ Recuerda: $8.00 USDT/mes de plataforma de gestión de códigos no incluidos en el cálculo automático';}
   var porSvc={};delMes.forEach(function(r){if(!porSvc[r.servicio])porSvc[r.servicio]={ing:0};porSvc[r.servicio].ing+=r.cobrado||0;});
   var maxI=Math.max.apply(null,Object.values(porSvc).map(function(v){return v.ing;}).concat([1]));
   G('ch-svc').innerHTML=Object.entries(porSvc).sort(function(a,b){return b[1].ing-a[1].ing;}).map(function(e){return '<div class="bar-row"><span class="bar-lbl">'+e[0]+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(e[1].ing/maxI*100)+'%"></div></div><span class="bar-val">'+fmt(e[1].ing)+'</span></div>';}).join('');
-  G('det-mes').innerHTML=delMes.length?delMes.map(function(r){var g=gan(r);return'<div class="acc-row"><span>'+r.nombre+' · '+r.servicio+'</span><span class="'+(g>=0?'g':'r')+'">'+fmt(r.cobrado)+'</span></div>';}).join(''):'<div class="mono" style="color:var(--td);font-size:10px;padding:.4rem 0">Sin registros</div>';
+  G('det-mes').innerHTML=delMes.length?delMes.map(function(r){var g=gan(r);var monTag=r.moneda==='bs'?'<span class="chip ch-w" style="margin-left:3px;font-size:7px">BCV</span>':'<span class="chip ch-rv" style="margin-left:3px;font-size:7px">USDT</span>';
+    var usdt=r.moneda==='bs'&&r.tasaP2P>0&&r.montoBs>0?' <span style="color:var(--warn);font-size:9px">(≈$'+(r.montoBs/r.tasaP2P).toFixed(2)+' USDT)</span>':'';
+    return'<div class="acc-row"><span>'+r.nombre+' · '+r.servicio+monTag+'</span><span class="'+(g>=0?'g':'r')+'">'+fmt(r.cobrado)+usdt+'</span></div>';}).join(''):'<div class="mono" style="color:var(--td);font-size:10px;padding:.4rem 0">Sin registros</div>';
 }
 function selMes(m){mesAct=m;renderCont();}
 
@@ -1135,6 +1182,166 @@ G('notes-ta').value=localStorage.getItem('nv5_notas')||'';
 initTema();initPin();initSheets();
 badges();renderDash();
 if(localStorage.getItem('nv5_sheets'))setTimeout(loadFromSheets,600);
+setTimeout(cargarTasas,800);
+
+// ── TASAS EN TIEMPO REAL ──────────────────────────────────────────
+var TASA_BCV_LIVE=0, TASA_P2P_LIVE=0;
+function cargarTasas(){
+  var url=localStorage.getItem('nv5_sheets');
+  if(!url){
+    // Intentar con el Apps Script de los catálogos
+    url='https://script.google.com/macros/s/AKfycbzeJkT_B6PnVU98E8ri3iR5aAhDZO60ENbzC6lr2VjmRe66behdqQbtyycEK2_lOGAL2Q/exec';
+  }
+  window._tasasCb=function(data){
+    var s=G('_sc_tasas');if(s)s.remove();
+    if(data&&data.ok){
+      TASA_BCV_LIVE=parseFloat(data.bcv)||0;
+      TASA_P2P_LIVE=parseFloat(data.p2p)||0;
+      var bcvEl=G('tasa-bcv-val'),p2pEl=G('tasa-p2p-val');
+      if(bcvEl)bcvEl.textContent='Bs. '+TASA_BCV_LIVE.toFixed(2);
+      if(p2pEl)p2pEl.textContent='Bs. '+TASA_P2P_LIVE.toFixed(2);
+      localStorage.setItem('nv5_tasa_bcv',TASA_BCV_LIVE);
+      localStorage.setItem('nv5_tasa_p2p',TASA_P2P_LIVE);
+    }
+  };
+  var s=document.createElement('script');s.id='_sc_tasas';
+  s.src=url+'?action=tasas&callback=_tasasCb';
+  document.head.appendChild(s);
+  // Mientras carga, mostrar última conocida
+  var bcvK=+localStorage.getItem('nv5_tasa_bcv')||0;
+  var p2pK=+localStorage.getItem('nv5_tasa_p2p')||0;
+  if(bcvK){var el=G('tasa-bcv-val');if(el)el.textContent='Bs. '+bcvK.toFixed(2)+' *';}
+  if(p2pK){var el=G('tasa-p2p-val');if(el)el.textContent='Bs. '+p2pK.toFixed(2)+' *';}
+}
+function usarTasasEnForm(){
+  // Poner las tasas actuales en los campos del formulario abierto
+  var bcv=TASA_BCV_LIVE||+localStorage.getItem('nv5_tasa_bcv')||0;
+  var p2p=TASA_P2P_LIVE||+localStorage.getItem('nv5_tasa_p2p')||0;
+  var tb=G('f-tasa-bcv'),tp=G('f-tasa-p2p');
+  if(bcv&&tb)tb.value=bcv;
+  if(p2p&&tp)tp.value=p2p;
+  if(bcv||p2p)calcBCV();
+  toast('Tasas aplicadas al formulario','#34d399');
+}
+
+// ── CATÁLOGO DE SERVICIOS ─────────────────────────────────────────
+var CATALOGO = {
+  'Netflix': [
+    {op:'Perfil normal (no editable)',          c1:1.57,  cr:1.32},
+    {op:'Perfil extra (alquiler)',               c1:3,     cr:3},
+    {op:'Perfil extra (dominio)',                c1:3,     cr:3},
+    {op:'Cuenta Premium COP (5 perfiles)',       c1:12.6,  cr:10.6},
+    {op:'Cuenta Premium VZLA/USA (5 perfiles)',  c1:15,    cr:15},
+  ],
+  'Disney+': [
+    {op:'Perfil Estándar', c1:0.57, cr:0.57},
+  ],
+  'HBOMAX': [
+    {op:'Perfil',                       c1:0.7, cr:0.7},
+    {op:'Cuenta Estándar (5 perfiles)', c1:3.5, cr:3.5},
+  ],
+  'Prime Video': [
+    {op:'Perfil',                       c1:0.2, cr:0.2},
+    {op:'Cuenta completa (4 perfiles)', c1:0.8, cr:0.8},
+  ],
+  'Crunchyroll': [
+    {op:'Perfil Fan',                   c1:0.4, cr:0.4},
+    {op:'Perfil MegaFan',               c1:0.9, cr:0.9},
+    {op:'Cuenta Fan (5 perfiles)',       c1:2,   cr:2},
+    {op:'Cuenta MegaFan (5 perfiles)',   c1:4.5, cr:4.5},
+  ],
+  'Canva': [
+    {op:'EDU mensual (panel 500 miembros)', c1:0.0025, cr:0.0025},
+    {op:'EDU anual (panel 500 miembros)',   c1:0.03,   cr:0.03},
+  ],
+  'Apple TV': [
+    {op:'Perfil', c1:0.375, cr:0.375},
+  ],
+  'Paramount+': [
+    {op:'Perfil', c1:0.58, cr:0.58},
+  ],
+  'CapCut': [
+    {op:'Perfil',                       c1:1.33, cr:1.33},
+    {op:'Cuenta completa (3 perfiles)', c1:4,    cr:4},
+  ],
+  'ChatGPT': [
+    {op:'Usuario compartido',  c1:0.66, cr:0.66},
+    {op:'Cuenta Individual',   c1:10,   cr:10},
+  ],
+  'Claude AI': [
+    {op:'Usuario compartido', c1:2,  cr:2},
+    {op:'Cuenta Individual',  c1:20, cr:20},
+  ],
+  'Spotify Premium': [
+    {op:'Activación plan familiar',     c1:0.9, cr:0.9},
+    {op:'Cuenta familiar (5 miembros)', c1:4.5, cr:4.5},
+  ],
+  'FlujoTV': [
+    {op:'Perfil compartido',                c1:0.93, cr:0.93},
+    {op:'Cuenta completa (3 dispositivos)', c1:2.8,  cr:2.8},
+  ],
+  'YouTube Premium': [
+    {op:'Activación plan familiar',     c1:0.5, cr:0.5},
+    {op:'Cuenta familiar (5 miembros)', c1:2.5, cr:2.5},
+  ],
+  'Recargas / Juegos': [
+    {op:'Consultar al interno', c1:0, cr:0},
+  ],
+}
+
+// Cuando cambia el servicio, llenar opciones y costos
+function onSvcChange(){
+  var svc=G('f-svc').value;
+  var optSel=G('f-opt-sel');
+  var c1=G('f-c1'),cr=G('f-cr');
+  if(!optSel)return;
+  // Limpiar opciones
+  optSel.innerHTML='<option value="">— Selecciona opción —</option>';
+  if(!svc||!CATALOGO[svc]){
+    optSel.style.display='none';
+    G('f-opt').style.display='block';
+    return;
+  }
+  // Llenar opciones del catálogo
+  CATALOGO[svc].forEach(function(o){
+    var el=document.createElement('option');
+    el.value=o.op;el.textContent=o.op+' ($'+o.c1+'/mes)';
+    optSel.appendChild(el);
+  });
+  optSel.style.display='block';
+  G('f-opt').style.display='none';
+  G('f-opt').value='';
+  // Limpiar costos
+  if(c1)c1.value='';if(cr)cr.value='';
+}
+
+function onOptChange(){
+  var svc=G('f-svc').value;
+  var optSel=G('f-opt-sel');
+  if(!optSel||!svc||!CATALOGO[svc])return;
+  var optVal=optSel.value;
+  // Sincronizar con el input hidden
+  G('f-opt').value=optVal;
+  // Cargar costos automáticamente
+  var found=CATALOGO[svc].find(function(o){return o.op===optVal;});
+  if(found){
+    var c1=G('f-c1'),cr=G('f-cr');
+    if(c1)c1.value=found.c1;
+    if(cr)cr.value=found.cr;
+    // Mostrar nota si primer mes != renovación
+    var nota=G('f-costo-nota');
+    if(nota){
+      if(found.c1!==found.cr){
+        nota.style.display='block';
+        nota.textContent='Mes 1: $'+found.c1+' · Renovación: $'+found.cr+' · puedes editarlos si cambian';
+      } else {
+        nota.textContent='$'+found.c1+'/mes · puedes editarlo si cambia';
+        nota.style.display='block';
+      }
+    }
+  }
+}
+
 </script>
 </body>
   </html>
