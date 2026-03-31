@@ -147,7 +147,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 .srch{background:var(--bg3);border:1px solid var(--bd);border-radius:5px;padding:3px 8px;font-family:var(--mono);font-size:10px;color:var(--tx);outline:none;width:130px}
 .srch:focus{border-color:var(--bdh)}
 .srch::placeholder{color:var(--td)}
-table{width:100%;border-collapse:collapse}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-wrap::-webkit-scrollbar{height:4px}
+.tbl-wrap::-webkit-scrollbar-track{background:var(--bg3)}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--pk);border-radius:2px}
+table{width:100%;border-collapse:collapse;min-width:700px}
 th{font-family:var(--mono);font-size:8px;color:var(--td);letter-spacing:.1em;text-transform:uppercase;padding:.5rem .9rem;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}
 td{padding:.55rem .9rem;font-size:12px;color:var(--tm);border-bottom:1px solid rgba(244,114,182,.04);vertical-align:middle}
 tr:last-child td{border-bottom:none}
@@ -364,8 +368,8 @@ td b{color:var(--tx);font-weight:600}
   </div>
   <div id="dash-alerts"></div>
   <div class="card"><div class="card-hd"><span class="card-title">próximos vencimientos</span></div>
-  <table><thead><tr><th>Cliente</th><th>Tipo</th><th>Servicio</th><th>Vence</th><th>Días</th><th>Estado</th><th></th></tr></thead>
-  <tbody id="dash-tbl"></tbody></table></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Tipo</th><th>Servicio</th><th>Vence</th><th>Días</th><th>Estado</th><th></th></tr></thead>
+  <tbody id="dash-tbl"></tbody></table></div></div>
 </div>
 
 <!-- CLIENTES -->
@@ -384,8 +388,8 @@ td b{color:var(--tx);font-weight:600}
         <input class="srch" placeholder="Buscar..." oninput="setS('cli',this.value)">
       </div>
     </div>
-    <table><thead><tr><th>Cliente</th><th>Servicio</th><th>Opción</th><th>Slots</th><th>Cobrado</th><th>Costo</th><th>Ganancia</th><th>Pago</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
-    <tbody id="tbl-cli"></tbody></table>
+    <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Servicio</th><th>Opción</th><th>Slots</th><th>Cobrado</th><th>Costo</th><th>Ganancia</th><th>Pago</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
+    <tbody id="tbl-cli"></tbody></table></div>
   </div>
 </div>
 
@@ -404,8 +408,8 @@ td b{color:var(--tx);font-weight:600}
         <input class="srch" placeholder="Buscar..." oninput="setS('rev',this.value)">
       </div>
     </div>
-    <table><thead><tr><th>Revendedor</th><th>Emprendimiento</th><th>Servicio</th><th>Opción</th><th>Cobrado</th><th>Costo</th><th>Ganancia</th><th>Pago</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
-    <tbody id="tbl-rev"></tbody></table>
+    <div class="tbl-wrap"><table><thead><tr><th>Revendedor</th><th>Emprendimiento</th><th>Servicio</th><th>Opción</th><th>Cobrado</th><th>Costo</th><th>Ganancia</th><th>Pago</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead>
+    <tbody id="tbl-rev"></tbody></table></div>
   </div>
 </div>
 
@@ -416,8 +420,8 @@ td b{color:var(--tx);font-weight:600}
     <button class="btn btn-pk btn-sm" onclick="abrirProv()">+ Nuevo proveedor</button>
   </div>
   <div class="card"><div class="card-hd"><span class="card-title">todos los proveedores</span></div>
-  <table><thead><tr><th>Proveedor</th><th>Servicio</th><th>Costo mes 1</th><th>Costo renovación</th><th>Próximo pago</th><th>Contacto</th><th>Notas</th><th></th></tr></thead>
-  <tbody id="tbl-prov"></tbody></table></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Proveedor</th><th>Servicio</th><th>Costo mes 1</th><th>Costo renovación</th><th>Próximo pago</th><th>Contacto</th><th>Notas</th><th></th></tr></thead>
+  <tbody id="tbl-prov"></tbody></table></div></div>
 </div>
 
 <!-- REEMBOLSOS -->
@@ -440,8 +444,8 @@ td b{color:var(--tx);font-weight:600}
       <button class="fb" onclick="setFR('saldado',this)">Saldados</button>
     </div>
   </div>
-  <table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
-  <tbody id="tbl-reemb"></tbody></table></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th></th></tr></thead>
+  <tbody id="tbl-reemb"></tbody></table></div></div>
 </div>
 
 <!-- CONTABILIDAD -->
@@ -1344,4 +1348,4 @@ function onOptChange(){
 
 </script>
 </body>
-  </html>
+      </html>
