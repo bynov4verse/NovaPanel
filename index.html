@@ -1730,8 +1730,24 @@ function conectarSheets() {
   if (!url || url.indexOf('script.google.com') < 0) { alert('URL inválida'); return; }
   localStorage.setItem('nv6_sheets', url);
   G('sh-ico').textContent = '✔'; G('sh-ico').style.color = 'var(--ok)';
-  hideModal(); toast('Conectando con Sheets...', '#fbbf24');
-  loadFromSheets();
+  hideModal();
+  // Preguntar si subir datos locales o bajar de Sheets
+  var tieneLocal = dbGet('cli').length > 0 || dbGet('rev').length > 0 || dbGet('prov').length > 0;
+  if (tieneLocal) {
+    if (confirm('¿Subir tus datos locales a Sheets?
+
+Sí → sube lo que tienes aquí a la nube
+No → descarga lo que hay en Sheets (¡cuidado: sobreescribe datos locales!)')) {
+      syncSheets();
+      toast('✓ Datos locales subidos a Sheets', '#34d399');
+    } else {
+      loadFromSheets();
+    }
+  } else {
+    // Sin datos locales, bajar de Sheets
+    toast('Cargando datos desde Sheets...', '#fbbf24');
+    loadFromSheets();
+  }
 }
 function desconectarSheets() {
   if (!confirm('¿Desconectar Google Sheets?')) return;
@@ -1786,7 +1802,16 @@ badges();
 poblarMeses();
 renderDash();
 setTimeout(cargarTasas, 800);
-if (localStorage.getItem('nv6_sheets')) setTimeout(loadFromSheets, 1000);
+// Al iniciar: cargar desde Sheets SOLO si no hay datos locales
+if (localStorage.getItem('nv6_sheets')) {
+  var tieneLocal = dbGet('cli').length > 0 || dbGet('rev').length > 0;
+  if (!tieneLocal) {
+    setTimeout(loadFromSheets, 1000);
+  } else {
+    // Hay datos locales: solo sincronizar (subir), no sobreescribir
+    setTimeout(syncSheets, 1500);
+  }
+}
 </script>
 </body>
-  </html>
+    </html>
