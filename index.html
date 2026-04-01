@@ -341,8 +341,15 @@ td b{color:var(--tx);font-weight:600}
 <!-- DASHBOARD -->
 <div class="page on" id="pg-dashboard">
   <div class="topbar">
-    <div><div class="pg-title">Dashboard</div><div class="pg-sub">// resumen general · novaverse</div></div>
+    <div>
+      <div class="pg-title">Dashboard</div>
+      <div class="pg-sub">// resumen general · novaverse</div>
+    </div>
     <div class="btn-grp">
+      <div style="display:flex;align-items:center;gap:.3rem">
+        <select id="dash-mes-sel" onchange="renderDash()" style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:.42rem .6rem;font-family:var(--mono);font-size:11px;color:var(--pk);outline:none;cursor:pointer;min-width:80px"></select>
+        <select id="dash-anio-sel" onchange="renderDash()" style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:.42rem .6rem;font-family:var(--mono);font-size:11px;color:var(--pk);outline:none;cursor:pointer;min-width:65px"></select>
+      </div>
       <button class="btn btn-gh btn-sm" onclick="exportJSON()">↓ Backup</button>
       <button class="btn btn-gh btn-sm" onclick="document.getElementById('imp').click()">↑ Restaurar</button>
       <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(this)">
@@ -1397,11 +1404,69 @@ function renderReemb() {
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────
-function renderDash() {
+var MESES_NOMBRES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function poblarMeses() {
   var cli = dbGet('cli'), rev = dbGet('rev');
   var todos = cli.concat(rev);
+  var ahora = new Date();
+  var mesActual = ahora.getMonth() + 1;  // 1-12
+  var anioActual = ahora.getFullYear();
+
+  // Rango fijo 2024-2027 + años de registros existentes
+  var aniosSet = {};
+  for (var y = 2024; y <= 2027; y++) aniosSet[y] = true;
+  todos.forEach(function(r) {
+    var m = mesYM(r.vence) || mesYM(r.fechaReg);
+    if (m) aniosSet[+m.split('-')[0]] = true;
+  });
+  var anios = Object.keys(aniosSet).map(Number).sort().reverse();
+
+  var selMes  = G('dash-mes-sel');
+  var selAnio = G('dash-anio-sel');
+  if (!selMes || !selAnio) return;
+
+  // Guardar selección anterior
+  var prevAnio = selAnio.value ? +selAnio.value : anioActual;
+  var prevMes  = selMes.value  ? +selMes.value  : mesActual;
+
+  // Poblar años
+  selAnio.innerHTML = '';
+  anios.forEach(function(a) {
+    var opt = document.createElement('option');
+    opt.value = a;
+    opt.textContent = a + (a === anioActual ? ' ★' : '');
+    selAnio.appendChild(opt);
+  });
+  selAnio.value = anios.indexOf(prevAnio) >= 0 ? prevAnio : anioActual;
+
+  // Poblar meses (todos los 12)
+  selMes.innerHTML = '';
+  for (var m = 1; m <= 12; m++) {
+    var opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = MESES_NOMBRES[m-1] + (m === mesActual && +selAnio.value === anioActual ? ' ★' : '');
+    selMes.appendChild(opt);
+  }
+  selMes.value = prevMes;
+}
+
+function getMesSeleccionado() {
+  var selMes  = G('dash-mes-sel');
+  var selAnio = G('dash-anio-sel');
+  if (!selMes || !selAnio) return hoy().substring(0,7);
+  var m = String(selMes.value).padStart(2,'0');
+  var a = selAnio.value;
+  return a + '-' + m;
+}
+
+function renderDash() {
+  poblarMeses();
+  var cli = dbGet('cli'), rev = dbGet('rev');
+  var todos = cli.concat(rev);
+  var mesSelec = getMesSeleccionado();
   var mesH = hoy().substring(0, 7);
-  var delMes = todos.filter(function(r) { return mesYM(r.vence) === mesH || mesYM(r.fechaReg) === mesH; });
+  var delMes = todos.filter(function(r) { return mesYM(r.vence) === mesSelec || mesYM(r.fechaReg) === mesSelec; });
   var ing = delMes.reduce(function(s, r) { return s + ingresoUSDT(r); }, 0);
   var gn  = delMes.reduce(function(s, r) { return s + ganancia(r); }, 0);
   G('d-cli').textContent = cli.length;
@@ -1448,6 +1513,11 @@ function updMeta(ing) {
   G('meta-obj').textContent = '$' + meta.toFixed(2);
   G('meta-pct').textContent = pct + '%';
   var mf = G('meta-fill'); if (mf) { mf.style.width = pct + '%'; mf.classList.toggle('done', pct >= 100); }
+  // Actualizar label meta según mes seleccionado
+  var mesSelec = getMesSeleccionado();
+  var mesH = hoy().substring(0, 7);
+  var metaLbl = G('meta-lbl');
+  if (metaLbl) metaLbl.textContent = 'Meta · ' + mesLbl(mesSelec);
 }
 
 // ── CONTABILIDAD ───────────────────────────────────────────────────
@@ -1713,9 +1783,10 @@ initTema();
 initPin();
 initSheets();
 badges();
+poblarMeses();
 renderDash();
 setTimeout(cargarTasas, 800);
 if (localStorage.getItem('nv6_sheets')) setTimeout(loadFromSheets, 1000);
 </script>
 </body>
-</html>
+  </html>
