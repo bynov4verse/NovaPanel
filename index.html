@@ -444,10 +444,11 @@ td b{color:var(--tx);font-weight:600}
       <div class="filters">
         <button class="fb on" onclick="setFR('todos',this)">Todos</button>
         <button class="fb" onclick="setFR('pendiente',this)">Pendientes</button>
+        <button class="fb" onclick="setFR('parcial',this)">Parciales</button>
         <button class="fb" onclick="setFR('saldado',this)">Saldados</button>
       </div>
     </div>
-    <div class="tbl-scroll"><table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto</th><th>Tipo</th><th>Estado</th><th>Saldado el</th><th>Acciones</th></tr></thead><tbody id="tbl-reemb"></tbody></table></div>
+    <div class="tbl-scroll"><table><thead><tr><th>Cliente/Rev.</th><th>Motivo</th><th>Servicio</th><th>Mes origen</th><th>Monto USDT</th><th>Tipo</th><th>Estado</th><th>Progreso</th><th>Saldado el</th><th>Acciones</th></tr></thead><tbody id="tbl-reemb"></tbody></table></div>
   </div>
 </div>
 
@@ -524,7 +525,11 @@ td b{color:var(--tx);font-weight:600}
         <option>Netflix</option><option>Disney+</option><option>HBOMAX</option><option>Prime Video</option>
         <option>Crunchyroll</option><option>Canva</option><option>Apple TV</option><option>Paramount+</option>
         <option>CapCut</option><option>ChatGPT</option><option>Spotify Premium</option><option>FlujoTV</option>
-        <option>YouTube Premium</option><option>Claude AI</option><option>Recargas / Juegos</option><option>Otro</option>
+        <option>YouTube Premium</option><option>Claude AI</option><option>Recargas / Juegos</option>
+        <option>Telelatino</option>
+        <option>Office 365</option>
+        <option>Plex</option>
+        <option>Deezer</option><option>Otro</option>
       </select>
     </div>
     <div class="field"><label>Opción / Plan</label>
@@ -623,28 +628,60 @@ td b{color:var(--tx);font-weight:600}
 
 <!-- Modal Reembolso -->
 <div class="modal" id="m-reemb" style="display:none">
-  <div class="modal-title">Registrar reembolso</div>
-  <div class="info-box">Deuda de un período pasado. <b style="color:var(--pkb)">No afecta los ingresos del mes actual.</b></div>
+  <div class="modal-title" id="m-reemb-title">Registrar reembolso</div>
+  <div class="info-box">Las deudas que <b style="color:var(--pkb)">yo debo</b> no afectan los ingresos — son un pasivo aparte. Puedes saldarlas en partes y ver el progreso.</div>
   <div class="fg">
     <div class="field"><label>Cliente / Revendedor</label><input id="rb-cli" placeholder="Nombre"></div>
     <div class="field"><label>Servicio</label><input id="rb-svc" placeholder="Netflix..."></div>
   </div>
   <div class="fg">
     <div class="field"><label>Mes de origen</label><input id="rb-mes" type="month"></div>
-    <div class="field"><label>Monto ($)</label><input id="rb-monto" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="field"><label>Monto total ($)</label><input id="rb-monto" type="number" step="0.01" placeholder="0.00"></div>
   </div>
   <div class="fg">
     <div class="field"><label>Tipo</label>
-      <select id="rb-tipo"><option value="debo">Yo debo</option><option value="debes">Me deben</option></select>
+      <select id="rb-tipo"><option value="debo">Yo debo (pasivo — no afecta ingresos)</option><option value="debes">Me deben a mí</option></select>
     </div>
-    <div class="field"><label>Estado</label>
-      <select id="rb-est"><option value="pendiente">Pendiente</option><option value="saldado">Ya saldado</option></select>
+    <div class="field"><label>Moneda de la deuda</label>
+      <select id="rb-moneda" onchange="toggleRBMoneda()">
+        <option value="usdt">USDT / Dólares</option>
+        <option value="bs">Bs (con tasa P2P)</option>
+      </select>
     </div>
+  </div>
+  <div class="fg" id="rb-p2p-wrap" style="display:none">
+    <div class="field"><label>Tasa P2P de referencia</label><input id="rb-tasa" type="number" step="0.01" placeholder="524.00"></div>
+    <div class="field"><label>Equivalencia en USDT</label><input id="rb-eq" type="number" step="0.01" placeholder="0.00" readonly style="opacity:.7"></div>
   </div>
   <div class="fg fg1"><div class="field"><label>Motivo</label><textarea id="rb-mot" rows="2" placeholder="Describe el motivo..."></textarea></div></div>
   <div class="modal-foot">
     <button class="btn btn-gh btn-sm" onclick="hideModal()">Cancelar</button>
     <button class="btn btn-pk btn-sm" onclick="guardarReemb()">Registrar</button>
+  </div>
+</div>
+
+<!-- Modal Pago Parcial -->
+<div class="modal" id="m-pago-parcial" style="display:none;max-width:400px">
+  <div class="modal-title">Registrar pago parcial</div>
+  <div class="info-box" id="pp-info"></div>
+  <div class="fg">
+    <div class="field"><label>Monto abonado</label><input id="pp-monto" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="field"><label>Moneda</label>
+      <select id="pp-moneda" onchange="togglePPMoneda()">
+        <option value="usdt">USDT / Dólares</option>
+        <option value="bs">Bs (con tasa P2P)</option>
+      </select>
+    </div>
+  </div>
+  <div class="fg" id="pp-p2p-wrap" style="display:none">
+    <div class="field"><label>Tasa P2P</label><input id="pp-tasa" type="number" step="0.01" placeholder="524.00" oninput="calcPP()"></div>
+    <div class="field"><label>Equivalencia USDT</label><input id="pp-eq" type="number" step="0.01" placeholder="0.00" readonly style="opacity:.7"></div>
+  </div>
+  <div class="fg fg1"><div class="field"><label>Nota del pago</label><input id="pp-nota" placeholder="Ej: abono del 15/03"></div></div>
+  <div id="pp-progreso" style="margin:.6rem 0;font-family:var(--mono);font-size:10px;color:var(--tm)"></div>
+  <div class="modal-foot">
+    <button class="btn btn-gh btn-sm" onclick="showModal('m-reemb')">Atrás</button>
+    <button class="btn btn-pk btn-sm" onclick="guardarPagoParcial()">Registrar pago</button>
   </div>
 </div>
 
@@ -802,6 +839,21 @@ var CAT = {
   'YouTube Premium':[
     {op:'Activación plan familiar',     c1:0.5, cr:0.5},
     {op:'Cuenta familiar (5 miembros)', c1:2.5, cr:2.5},
+  ],
+  'Telelatino':[
+    {op:'Perfil',                            c1:0.93, cr:0.93},
+    {op:'Cuenta completa (3 dispositivos)',  c1:3,    cr:3},
+  ],
+  'Office 365':[
+    {op:'5 dispositivos (1 año · 3 meses garantía)', c1:5, cr:5},
+  ],
+  'Plex':[
+    {op:'Perfil',                            c1:1.5,  cr:1.5},
+    {op:'Cuenta completa (3 dispositivos)',  c1:3.5,  cr:3.5},
+  ],
+  'Deezer':[
+    {op:'Activación individual (alquiler)',  c1:1,    cr:1},
+    {op:'Activación individual (dominio)',   c1:1,    cr:1},
   ],
   'Recargas / Juegos':[{op:'Consultar al interno', c1:0, cr:0}],
 };
@@ -1044,20 +1096,88 @@ function guardarProv() {
   hideModal(); renderProv(); syncSheets(); toast('✓ Guardado', '#34d399');
 }
 
+
+function toggleRBMoneda() {
+  var isBs = GV('rb-moneda') === 'bs';
+  var wrap = G('rb-p2p-wrap');
+  if (wrap) wrap.style.display = isBs ? 'grid' : 'none';
+}
+function calcRB() {
+  var monto = parseFloat(GV('rb-monto')) || 0;
+  var tasa = parseFloat(GV('rb-tasa')) || 0;
+  var eq = G('rb-eq');
+  if (monto > 0 && tasa > 0 && eq) eq.value = (monto/tasa).toFixed(2);
+}
 function guardarReemb() {
   var cli = GV('rb-cli').trim();
   if (!cli) { alert('Ingresa el nombre'); return; }
   var arr = dbGet('reemb');
+  var monto = +GV('rb-monto') || 0;
+  var moneda = GV('rb-moneda') || 'usdt';
+  var tasa = parseFloat(GV('rb-tasa')) || 0;
+  var montoUSdt = moneda === 'bs' && tasa > 0 ? monto / tasa : monto;
+  var prev = eId ? arr.find(function(x){return x.id===eId;}) : null;
   var obj = {
     id: eId || uid(), cliente: cli, servicio: GV('rb-svc').trim(),
-    mes: GV('rb-mes'), monto: +GV('rb-monto') || 0,
-    tipo: GV('rb-tipo'), estado: GV('rb-est'),
+    mes: GV('rb-mes'), monto: monto, moneda: moneda,
+    tasaP2P: tasa, montoUSdt: montoUSdt,
+    tipo: GV('rb-tipo'),
+    estado: 'pendiente',
     motivo: GV('rb-mot').trim(), fechaReg: hoy(),
-    fechaSaldo: GV('rb-est') === 'saldado' ? hoy() : null
+    pagos: prev ? prev.pagos || [] : [],
+    pagado: prev ? prev.pagado || 0 : 0,
   };
+  // Estado automático según pagos
+  obj.estado = obj.pagado >= obj.montoUSdt && obj.montoUSdt > 0 ? 'saldado' : obj.pagado > 0 ? 'parcial' : 'pendiente';
   if (eId) { dbSet('reemb', arr.map(function(x) { return x.id === eId ? obj : x; })); }
   else { arr.push(obj); dbSet('reemb', arr); }
   hideModal(); renderReemb(); badges(); syncSheets(); toast('✓ Registrado', '#34d399');
+}
+
+function abrirPagoParcial(id) {
+  var r = dbGet('reemb').find(function(x){return x.id===id;});
+  if (!r) return;
+  eId = id;
+  var pagado = r.pagado || 0;
+  var pendiente = (r.montoUSdt || r.monto || 0) - pagado;
+  G('pp-info').innerHTML = '<b>' + r.cliente + '</b> · Deuda total: $' + (r.montoUSdt||r.monto||0).toFixed(2) + ' USDT · Pagado: $' + pagado.toFixed(2) + ' · Pendiente: $' + pendiente.toFixed(2);
+  SV('pp-monto',''); SV('pp-tasa',''); SV('pp-eq',''); SV('pp-nota','');
+  SV('pp-moneda','usdt'); G('pp-p2p-wrap').style.display='none';
+  // Mostrar historial de pagos
+  var hist = r.pagos || [];
+  var ph = hist.length ? '<div style="font-family:var(--mono);font-size:9px;color:var(--td);margin-top:.5rem">Pagos anteriores:</div>' + hist.map(function(p){return '<div style="font-family:var(--mono);font-size:9px;color:var(--tm);padding:2px 0">'+p.fecha+' · $'+p.montoUSdt.toFixed(2)+' USDT'+(p.nota?' · '+p.nota:'')+'</div>';}).join('') : '';
+  G('pp-progreso').innerHTML = ph;
+  showModal('m-pago-parcial');
+}
+
+function togglePPMoneda() {
+  var isBs = GV('pp-moneda') === 'bs';
+  G('pp-p2p-wrap').style.display = isBs ? 'grid' : 'none';
+}
+
+function calcPP() {
+  var monto = parseFloat(GV('pp-monto')) || 0;
+  var tasa = parseFloat(GV('pp-tasa')) || 0;
+  if (monto > 0 && tasa > 0) SV('pp-eq', (monto/tasa).toFixed(2));
+}
+
+function guardarPagoParcial() {
+  var monto = parseFloat(GV('pp-monto')) || 0;
+  if (!monto) { alert('Ingresa el monto'); return; }
+  var moneda = GV('pp-moneda');
+  var tasa = parseFloat(GV('pp-tasa')) || 0;
+  var montoUSdt = moneda === 'bs' && tasa > 0 ? monto / tasa : monto;
+  var arr = dbGet('reemb');
+  var r = arr.find(function(x){return x.id===eId;});
+  if (!r) return;
+  r.pagos = r.pagos || [];
+  r.pagos.push({fecha:hoy(), monto:monto, moneda:moneda, tasaP2P:tasa, montoUSdt:montoUSdt, nota:GV('pp-nota').trim()});
+  r.pagado = r.pagos.reduce(function(s,p){return s+p.montoUSdt;},0);
+  r.estado = r.pagado >= (r.montoUSdt||r.monto||0) ? 'saldado' : 'parcial';
+  if (r.estado === 'saldado') r.fechaSaldo = hoy();
+  dbSet('reemb', arr);
+  hideModal(); renderReemb(); badges(); syncSheets();
+  toast('✓ Pago registrado — ' + (r.estado==='saldado'?'¡Deuda saldada!':'parcial'), '#34d399');
 }
 
 function renovar(col, id) {
@@ -1128,6 +1248,7 @@ document.addEventListener('click', function(e) {
   if (fn === 'del')       eliminar(col, id);
   if (fn === 'saldar')    saldar(id);
   if (fn === 'saldarA')   saldar(id, 'alertas');
+  if (fn === 'abrirPagoParcial') abrirPagoParcial(id);
 });
 
 // ── HELPERS PARA CREAR BOTONES DE TABLA ────────────────────────────
@@ -1235,36 +1356,44 @@ function renderProv() {
 
 function renderReemb() {
   var all = dbGet('reemb');
-  var pend = all.filter(function(r) { return r.estado === 'pendiente'; });
+  var pend = all.filter(function(r) { return r.estado !== 'saldado'; });
+  var sold = all.filter(function(r) { return r.estado === 'saldado'; });
+  var montoPend = pend.reduce(function(s,r){ return s+(r.montoUSdt||r.monto||0)-(r.pagado||0); },0);
   G('r-pend').textContent = pend.length;
-  G('r-sold').textContent = all.filter(function(r) { return r.estado === 'saldado'; }).length;
-  G('r-mont').textContent = fmt(pend.reduce(function(s, r) { return s + r.monto; }, 0));
-  G('r-tot').textContent  = fmt(all.reduce(function(s, r) { return s + r.monto; }, 0));
-  var data = all.filter(function(r) { return fReemb === 'todos' || r.estado === fReemb; });
+  G('r-sold').textContent = sold.length;
+  G('r-mont').textContent = '$' + montoPend.toFixed(2);
+  G('r-tot').textContent  = fmt(all.reduce(function(s,r){return s+(r.montoUSdt||r.monto||0);},0));
+  var data = all.filter(function(r){return fReemb==='todos'||r.estado===fReemb;});
   var tbody = G('tbl-reemb');
   if (!data.length) {
-    tbody.innerHTML = '<tr><td colspan="9"><div class="empty"><div class="empty-ico">◬</div><div class="empty-txt">sin reembolsos</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty"><div class="empty-ico">◬</div><div class="empty-txt">sin reembolsos</div></div></td></tr>';
     return;
   }
-  var html = '';
+  var html2 = '';
   for (var i = 0; i < data.length; i++) {
     var r = data[i];
-    html += '<tr>';
-    html += '<td><b>' + r.cliente + '</b></td>';
-    html += '<td style="font-size:11px;color:var(--tm)">' + (r.motivo || '—') + '</td>';
-    html += '<td><span class="tag">' + (r.servicio || '—') + '</span></td>';
-    html += '<td class="mono" style="font-size:10px">' + (mesLbl(r.mes) || '—') + '</td>';
-    html += '<td class="' + (r.tipo === 'debo' ? 'r' : 'g') + '">' + fmt(r.monto) + '</td>';
-    html += '<td>' + chip(r.tipo === 'debo' ? 'vencido' : 'por vencer') + '</td>';
-    html += '<td>' + chip(r.estado) + '</td>';
-    html += '<td class="mono" style="font-size:10px">' + (r.fechaSaldo || '—') + '</td>';
-    html += '<td><div class="acts">';
-    if (r.estado === 'pendiente') html += mkBtn('btn-ok btn-xs', 'saldar', r.id, null, null, '✓');
-    html += mkBtn('btn-gh btn-xs', 'editReemb', r.id, null, null, '✎');
-    html += mkBtn('btn-err btn-xs', 'del', r.id, 'reemb', null, '✕');
-    html += '</div></td></tr>';
+    var total = r.montoUSdt || r.monto || 0;
+    var pagado = r.pagado || 0;
+    var pct = total > 0 ? Math.min(Math.round(pagado/total*100),100) : 0;
+    var progBar = '<div style="height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:3px"><div style="height:100%;border-radius:2px;width:'+pct+'%;background:linear-gradient(90deg,var(--pkd),var(--pk))"></div></div><div style="font-family:var(--mono);font-size:8px;color:var(--td);margin-top:1px">$'+pagado.toFixed(2)+' / $'+total.toFixed(2)+' USDT ('+pct+'%)</div>';
+    var estadoChip = r.estado === 'saldado' ? chip('saldado') : r.estado === 'parcial' ? '<span class="chip ch-w">parcial</span>' : chip('pendiente');
+    html2 += '<tr>';
+    html2 += '<td><b>' + r.cliente + '</b></td>';
+    html2 += '<td style="font-size:11px;color:var(--tm)">' + (r.motivo||'—') + '</td>';
+    html2 += '<td><span class="tag">' + (r.servicio||'—') + '</span></td>';
+    html2 += '<td class="mono" style="font-size:10px">' + (mesLbl(r.mes)||'—') + '</td>';
+    html2 += '<td class="' + (r.tipo==='debo'?'r':'g') + '">' + (r.moneda==='bs'?'Bs→':'') + '$' + total.toFixed(2) + ' USDT</td>';
+    html2 += '<td>' + chip(r.tipo==='debo'?'vencido':'por vencer') + '</td>';
+    html2 += '<td>' + estadoChip + '</td>';
+    html2 += '<td>' + progBar + '</td>';
+    html2 += '<td class="mono" style="font-size:10px">' + (r.fechaSaldo||'—') + '</td>';
+    html2 += '<td><div class="acts">';
+    if (r.estado !== 'saldado') html2 += mkBtn('btn-ok btn-xs','abrirPagoParcial',r.id,null,null,'+ Pago');
+    html2 += mkBtn('btn-gh btn-xs','editReemb',r.id,null,null,'✎');
+    html2 += mkBtn('btn-err btn-xs','del',r.id,'reemb',null,'✕');
+    html2 += '</div></td></tr>';
   }
-  tbody.innerHTML = html;
+  tbody.innerHTML = html2;
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────
@@ -1589,4 +1718,4 @@ setTimeout(cargarTasas, 800);
 if (localStorage.getItem('nv6_sheets')) setTimeout(loadFromSheets, 1000);
 </script>
 </body>
-  </html>
+</html>
